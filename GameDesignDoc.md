@@ -1,89 +1,64 @@
 # Game Design Document
-This is a place holder for your game design document. You are advised to write your document in [Markdown](http://daringfireball.net/projects/markdown/) and the following section will show you how to write a document using Markdown markup.
 
-Alternativley, you can write your document in plain text if you wish.
+## Objective
 
-----
+A side scroller in which a character needs to continually avoid obstacles and enemies. The speed and frequency of enemies will increase over time.
 
-## Markdown
-Markdown is a human-readable structured plain text format that is used to convert text into HTML. GitHub automatically renders Markdown into HTML.
+## Characters
+### Main Character
 
-This is a crash course on how to use Markdown. The following section will show you the plain text used to generate the document shown in the rendering section.
+The main character is a blue Yoshi with an orb on it's head. It's image will change when the character running, jumping, crouching and is hurt.
+It can emit electricity from the orb on it's head which can kill enemies.  
 
-### Code
+### Obstacle #1
 
-```
-# Header 1
-## Header 2
-### Header 3
-#### Header 4
-##### Header 5
+A wall that the character has to jump over to avoid. 
 
-You can also write in **bold** or _italics_. You can also ~~strike through~~ or write inline `Code Segments`
+### Obstacle #2
 
->Blockquotes are done as such.
+Goomba-like character that can be killed by jumping on it or by a lightning bolt.
 
-Just make sure to separate paragraphs with an emptyline. 
-Otherwise, they are considered in the same paragraph.
+### Obstacle #3
 
-You link to [Google](https://www.google.com) as such and lists are written has follows:
-  1. First you indent with two empty spaces.
-  1. Then, you use:
-    * `1.` to signal an ordered (i.e. numbered) list, or
-    * `*`, `-`, `+` to represent an unordered list.
-      1. Make sure to maintain indentation
-      1. As it is used to identify sub-lists
-  1. Numbering and symboles don't matter as they are auto-generated later.
+Big Bullet-- can be double jumped over or crouched to avoid. If jumped over and landed on will fall/disappear.
 
-Tables are pretty easy to make:
+### Obstacle #4
 
-| Tables        | Are           | Easy          |
-| ------------- |:-------------:| -------------:|
-| left-aligned  | centered      | right-aligned |
-| header are    | bolded and    | centered      |
-| zebra stripes | are neat      | 1             |
+Spike Koopa Troopa. Can't be jumped on due to spike shell. Can only be electrocuted.
+Possibly an upgraded version that mimics the main character's jumps crouches so it can only be electrocuted.
 
+### Obstacle #5
 
-Images are added inline by using the following syntax
-![alt text](http://octodex.github.com/images/Professortocat_v2.png "Image Title")
-```
+Flying witch. Hovers over character and drops sharp object (spike). Can be avoided by crouching or killing it by jumping and hitting it with bolt.
 
-----
+### Additional possible obstacles
 
-### Rendering
-This section shows the rendering of the plain text above.
+Invincibility star that makes character immune from obstacles for a short period of time.
+Extra life heart or mushroom.
 
-# Header 1
-## Header 2
-### Header 3
-#### Header 4
-##### Header 5
+## Controls
 
-You can also write in **bold** or _italics_. You can also ~~strike through~~ or write inline `Code Segments`
+Up key to jump. Up key while jumping to double jump.
+Down key to crouch and turn into an egg.
+Space bar or right key to emit electricity. Bolts can be emitted single or continuously.
 
->Blockquotes are done as such.
-
-Just make sure to separate paragraphs with an emptyline. 
-Otherwise, they are considered in the same paragraph.
-
-You link to [Google](https://www.google.com) as such and lists are written has follows:
-  1. First you indent with two empty spaces.
-  1. Then, you use:
-    * `1.` to signal an ordered (i.e. numbered) list, or
-    * `*`, `-`, `+` to represent an unordered list.
-      1. Make sure to maintain indentation
-      1. As it is used to identify sub-lists
-  1. Numbering and symboles don't matter as they are auto-generated later.
-
-Tables are pretty easy to make:
-
-| Tables        | Are           | Easy          |
-| ------------- |:-------------:| -------------:|
-| left-aligned  | centered      | right-aligned |
-| header are    | bolded and    | centered      |
-| zebra stripes | are neat      | 1             |
+Can't emit electricity when rising (in jump) or crouching.
 
 
-Images are added inline by using the following syntax
+## Score
+
+Increases with time. Killing obstacles 2-5 will increase score even more.
+Once the score hits certain amounts the speed of the game will increase even more.
+
+## Lives
+
+Players will start with 3 lives. If one of the obstacles comes in contact with the character (as detailed above) it will lose a life.
+
+## Menu
+Resume button depending on if game is active.
+Start new game button.
+Help button if game is inactive.
+Space for yet to be created scores button if game is inactive.
+
 ![alt text](http://octodex.github.com/images/Professortocat_v2.png "Image Title")
 
