@@ -16,20 +16,23 @@ A wall that the character has to jump over to avoid. ![alt text](/Pictures/Wall.
 
 ### Obstacle #2
 
-Shy Guy-like character that can be killed by jumping on it or by a lightning bolt.![alt text](/Pictures/Shy Guy.png "Shy Guy")
+Shy Guy-like character that can be killed by jumping on it or by a lightning bolt. ![alt text](/Pictures/Shy Guy.png "Shy Guy")
 
 ### Obstacle #3
 
-Big Bullet-- can be double jumped over or crouched to avoid. If jumped over and landed on will fall/disappear. ![alt text](/Pictures/Bullet.png "Bullet")
+Big Bullet-- can be double jumped over or crouched to avoid. If jumped over and landed on will fall/disappear. 
+![alt text](/Pictures/Bullet.png "Bullet")
 
 ### Obstacle #4
 
 Spike Koopa Troopa. Can't be jumped on due to spike shell. Can only be electrocuted.
-Possibly an upgraded version that mimics the main character's jumps crouches so it can only be electrocuted. ![alt text](/Pictures/Spike Troopa.png "Spike Troopa")
+Possibly an upgraded version that mimics the main character's jumps crouches so it can only be electrocuted. 
+![alt text](/Pictures/Spike Troopa.png "Spike Troopa")
 
 ### Obstacle #5
 
-Flying witch. Hovers over character and drops sharp object (spike). Can be avoided by crouching or killing it by jumping and hitting it with bolt. ![alt text](/Pictures/Witch.png "Witch")
+Flying witch. Hovers over character and drops sharp object (spike). Can be avoided by crouching or killing it by jumping and hitting it with bolt.
+![alt text](/Pictures/Witch.png "Witch")
 
 ### Additional possible obstacles
 
