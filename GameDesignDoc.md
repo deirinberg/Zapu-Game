@@ -8,28 +8,28 @@ A side scroller in which a character needs to continually avoid obstacles and en
 ### Main Character
 
 The main character is a blue Yoshi with an orb on it's head. It's image will change when the character running, jumping, crouching and is hurt.
-It can emit electricity from the orb on it's head which can kill enemies.  
+It can emit electricity from the orb on it's head which can kill enemies. ![alt text](/Pictures/YW1.png "Yoshi")
 
 ### Obstacle #1
 
-A wall that the character has to jump over to avoid. 
+A wall that the character has to jump over to avoid. ![alt text](/Pictures/Wall.png "Wall")
 
 ### Obstacle #2
 
-Goomba-like character that can be killed by jumping on it or by a lightning bolt.
+Shy Guy-like character that can be killed by jumping on it or by a lightning bolt.![alt text](/Pictures/Shy Guy.png "Shy Guy")
 
 ### Obstacle #3
 
-Big Bullet-- can be double jumped over or crouched to avoid. If jumped over and landed on will fall/disappear.
+Big Bullet-- can be double jumped over or crouched to avoid. If jumped over and landed on will fall/disappear. ![alt text](/Pictures/Bullet.png "Bullet")
 
 ### Obstacle #4
 
 Spike Koopa Troopa. Can't be jumped on due to spike shell. Can only be electrocuted.
-Possibly an upgraded version that mimics the main character's jumps crouches so it can only be electrocuted.
+Possibly an upgraded version that mimics the main character's jumps crouches so it can only be electrocuted. ![alt text](/Pictures/Spike Troopa.png "Spike Troopa")
 
 ### Obstacle #5
 
-Flying witch. Hovers over character and drops sharp object (spike). Can be avoided by crouching or killing it by jumping and hitting it with bolt.
+Flying witch. Hovers over character and drops sharp object (spike). Can be avoided by crouching or killing it by jumping and hitting it with bolt. ![alt text](/Pictures/Witch.png "Witch")
 
 ### Additional possible obstacles
 
@@ -55,10 +55,19 @@ Once the score hits certain amounts the speed of the game will increase even mor
 Players will start with 3 lives. If one of the obstacles comes in contact with the character (as detailed above) it will lose a life.
 
 ## Menu
+Status Bar above Game Play
 Resume button depending on if game is active.
 Start new game button.
 Help button if game is inactive.
+Quit button on both pause and regular menus.
 Space for yet to be created scores button if game is inactive.
 
-![alt text](http://octodex.github.com/images/Professortocat_v2.png "Image Title")
+#### Main Menu
+![alt text](/Pictures/Main Menu.png "Main Menu")
+
+#### Pause Menu
+![alt text](/Pictures/Pause Menu.png "Pause Menu")
+
+#### Game Window
+![alt text](/Pictures/Game Window.png "Game Window")
 
