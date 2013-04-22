@@ -21,6 +21,8 @@
 #include <QGraphicsItemAnimation>
 #include <QPushButton>
 #include <vector>
+#include <QKeyEvent>
+#include <QAbstractScrollArea>
 #include "object.h"
 
 #define WINDOW_MAX_X 250
@@ -85,6 +87,10 @@ private:
     vector<Object*> objects;
     /** Timer to animate the movement of tiles */
     QTimer *timer;
+    
+protected:
+ void keyPressEvent(QKeyEvent *e);
+ void keyReleaseEvent(QKeyEvent *r);
 
 public slots:
     /** Starts the game when the appropriate button is pressed */

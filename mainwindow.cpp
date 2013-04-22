@@ -19,18 +19,25 @@ void MainWindow::clearSol(){
 }
 
 void MainWindow::animate(){
- if(count%40 == 0){
-  //for (unsigned int i=0; i<objects.size(); i++ ) {
-      //MainChar *m = objects[i];
-      objects[2]->walk(); //What move method gets called?
-     //scene->addItem(objects.at(i));
-    //}
-  }
+  objects[2]->move(count); 
   count++;
 }
 
 void MainWindow::startGame(){
 
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *e){
+ objects[2]->keySignal(e);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *r){
+ if(r->isAutoRepeat()){
+  r->ignore();
+ }
+ else{
+  objects[2]->keyRelease(r);
+ }
 }
 
 /** MainWindow default constructor. A new scene is created a view is set to
@@ -79,11 +86,6 @@ MainWindow::MainWindow()  {
     heurLayout->addRow(heurTxt);
     layout->addLayout(heurLayout, 4, 9, 1, 1);
     
-    view->setFixedSize(3*WINDOW_MAX_X/2+108, 3*WINDOW_MAX_Y/2-34);
-    viewLayout->addRow(view);
-    view->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
-    layout->addLayout(viewLayout, 1, 0, 9, 9);
-    
     sizeEdit = new QLineEdit(); 
     layout->addWidget(sizeEdit, 1, 10, 1, 1);
     
@@ -129,6 +131,14 @@ MainWindow::MainWindow()  {
     timer->setInterval(4);
     timer->start();
     
+    
+    view->setFixedSize(3*WINDOW_MAX_X/2+75, 3*WINDOW_MAX_Y/2-34);
+    viewLayout->addRow(view);
+    view->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    QWidget::setFocus();
+    layout->addLayout(viewLayout, 1, 0, 9, 9);
     QPixmap *background = new QPixmap("/home/cs102/game_eirinber/Pictures/Background.png");
     Background *b  = new Background(background, 0, -307); // Let’s pretend a default constructor
     objects.push_back(b);
@@ -143,6 +153,7 @@ MainWindow::MainWindow()  {
      scene->addItem(objects.at(i));
     }
     setLayout(layout);
+    
 }
 
 /** QWidget shows all that has been added to it (the grid layout).
