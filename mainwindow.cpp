@@ -27,6 +27,13 @@ void MainWindow::animate(){
   if(objects[last]->vX == 1){
    for(int i = 1; i<last; i++){
     objects[i]->move(count);
+    if(i == 1){
+     int floor =  floor = objects[i]->pos().y();
+      if(objects[i]->pos().x() <-24 && (objects[i+1]->pos().x()>82)){
+        floor = 500;
+       }
+       objects[last]->setGround(floor);
+     }
      if(i == (last-1) && (objects[last-1]->pos().x() - objects[last-2]->pos().x())>64){
       QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground16.png");
       objects[i-1]->setPixmap(*ground);

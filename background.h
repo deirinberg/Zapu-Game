@@ -6,6 +6,7 @@ class Background: public Object {
  public:
  Background (QPixmap *pm, int nx, int ny);
  void move(int count); // Implement the move method
+ void setGround(int y);
  void keySignal(QKeyEvent *e);
  void keyRelease(QKeyEvent *r);
 };
@@ -16,6 +17,10 @@ Background::Background( QPixmap *pm, int nx, int ny ) : Object( pm, nx, ny ) {
 void Background::move(int count) {
 setPos(100, 100);
 //Implement the movement behavior of BigThing here. This is required.
+}
+
+void Background::setGround(int y){
+ 
 }
 
 void Background::keySignal(QKeyEvent *e){

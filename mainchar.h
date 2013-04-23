@@ -9,12 +9,16 @@ class MainChar: public Object {
  void move(int count); 
  void keySignal(QKeyEvent *e);
  void keyRelease(QKeyEvent *r);
+ void setGround(int y);
  void walk();
  void crouch();
  void jump();
  int num;
+ int vY;
+ int floor;
  double time;
  double ty;
+ bool fall;
  bool stopWalking;
  bool walking;
  bool pause;
@@ -25,10 +29,13 @@ class MainChar: public Object {
 };
 
 MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Object( pm, nx, ny ) {
+ floor = 0;
  num = 0;
  vX = 0;
+ vY = 0;
  walking = false;
  egg = false;
+ fall = false;
  jumping = false;
  doubleJump = false;
  stopWalking = false;
@@ -135,6 +142,25 @@ void MainChar::keyRelease(QKeyEvent *e){
   }
 }
 
+void MainChar::setGround(int y){
+if(fall == false){
+ if(y == 20){
+  //cout<<"FIRST LEVEL\n";
+  floor = 0;
+ }
+ else if(y == -1){
+  //cout<<"SECOND LEVEL\n";
+  floor = -21;
+ }
+ else if(y == -21){
+  floor = -41;
+ }
+ else if(y > 20){
+  //cout<<"GAP LEVEL\n";
+  floor = 10000;
+ }
+}
+}
 void MainChar::crouch(){
  QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Egg2.png");
  setPixmap(*pm);
@@ -143,14 +169,26 @@ void MainChar::crouch(){
 void MainChar::jump(){
   QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump1.png");
   int vi = 50;
-  if(dj == true && doubleJump == true){
+  if(fall == true){
+    walking = false;
+    vi = 0;
+  }
+  else if(doubleJump == true){
+    vi = 50;
+   if(dj == true){
     time = 0;
-    vi = 10;
     dj = false;
+   }
   }
   float yi = vi*time + -5*time*time;
   time += .1;
   float yf = vi*time + -5*time*time;
+  if((yi-yf) < 0){
+    vY = -1;
+  }
+  else if((yi-yf) > 0){
+    vY = 1;
+  }
   if(doubleJump == true && (yi - yf)<0){
    double t = time/0.4;
    int pic = (int)t;
@@ -186,11 +224,18 @@ void MainChar::jump(){
    pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump2.png");
   }
   ty += (yi-yf);
-  if(ty < 0){
+  cout<<ty<<endl;
+  if(ty > 10){
+   floor = 10000;
+  }
+  if((yf-yi)>0 || ty < floor){
   moveBy(0, yi-yf);
+   if(ty > 100){
+    walking = false;
+   }
   }
   else{
-   moveBy(0, yi-yf-ty);
+   setPos(pos().x(), floor-55);
    jumping = false;
    dj = false;
    doubleJump = false;
@@ -204,7 +249,13 @@ void MainChar::jump(){
 }
 
 void MainChar::walk(){
- QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW1.png");
+ if(floor > 0){
+  fall = true;
+  walking = false;
+  jumping = true;
+ }
+ else{
+  QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW1.png");
   switch(num){
    case 1: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW2.png"); break;
    case 2: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW3.png"); break;
@@ -221,6 +272,7 @@ void MainChar::walk(){
     num = 0;
    }
   setPixmap(*pm);
+  }
 }
 
 #endif // MAINCHAR_H

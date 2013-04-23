@@ -7,6 +7,7 @@ class Ground: public Object {
  public:
  Ground (QPixmap *pm, int nx, int ny);
  void move(int count); // Implement the move method
+ void setGround(int y);
  void setInitial();
  void newImage(int max);
  void keySignal(QKeyEvent *e);
@@ -16,7 +17,6 @@ class Ground: public Object {
 };
 
 Ground::Ground( QPixmap *pm, int nx, int ny ) : Object( pm, nx, ny ) {
- cout<<"NEW GROUND"<<endl;
 if(nx < 700){
  newImage(12);
  }
@@ -25,7 +25,7 @@ else{
 }
 }
 void Ground::move(int count) {
- if(count%4 == 0){
+ if(count%3 == 0){
  moveBy(-1, 0);
  }
 }
@@ -35,12 +35,7 @@ void Ground::newImage(int max){
  srand(time(NULL));
  int pic = rand()%max;
  cout<<pic<<endl;
- /*if(continuous == false){
-  cout<<"CAUSE? "<<pos().x()<<endl;
-  p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground16.png"); 
-  continuous = false;
- }*/
-// else{
+
   switch(pic){
   case 0: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground2.png"); break;
   case 1: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground3.png"); break;
@@ -57,17 +52,37 @@ void Ground::newImage(int max){
   case 12: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground14.png"); break;
   default: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground15.png"); 
     if(pos().y() == 20){
-    setPos(pos().x()+96, pos().y()-21);
-    y -= 21;
+     if(pic%2 == 1){
+      setPos(pos().x()+128, pos().y()-21);
+     }
+     else{
+     setPos(pos().x()+128, pos().y()-41);
+     }
     }
-    else{
-    setPos(pos().x()+96, pos().y()+21);
-    y+=21;
+    else if(pos().y() == -1){
+     if(pic%2 == 1){
+     setPos(pos().x()+128, pos().y()+21);
+     }
+     else{
+     setPos(pos().x()+128, pos().y()-20);
+     }
+    }
+    else if(pos().y() == -21){
+     if(pic%2 == 1){
+     setPos(pos().x()+128, pos().y()+41);
+     }
+     else{
+     setPos(pos().x()+128, pos().y()+20);
+     }
     }
     break;
   }
 // }
  setPixmap(*p);
+}
+
+void Ground::setGround(int y){
+
 }
 
 void Ground::keySignal(QKeyEvent *e){
