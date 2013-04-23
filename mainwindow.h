@@ -22,6 +22,7 @@
 #include <QPushButton>
 #include <vector>
 #include <QKeyEvent>
+#include <QMouseEvent>
 #include <QAbstractScrollArea>
 #include "object.h"
 
@@ -91,6 +92,7 @@ private:
 protected:
  void keyPressEvent(QKeyEvent *e);
  void keyReleaseEvent(QKeyEvent *r);
+ void mouseEvent(QMouseEvent *m);
 
 public slots:
     /** Starts the game when the appropriate button is pressed */

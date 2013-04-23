@@ -9,11 +9,12 @@ Object (QPixmap *pm, int nx, int ny);
 virtual void move(int count) = 0; //virtual function. Class Thing is abstract. For a reason.
 virtual void keySignal(QKeyEvent *e) = 0;
 virtual void keyRelease(QKeyEvent *r) = 0;
-private: //Every thing has a origin and a velocity – maybe 0
+//virtual int getvX() = 0;
 int x;
 int y;
 int vX;
 int vY;
+private: //Every thing has a origin and a velocity – maybe 0
 QPixmap *pixMap; //Good idea. Explain later.
 };
 

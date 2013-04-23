@@ -19,7 +19,37 @@ void MainWindow::clearSol(){
 }
 
 void MainWindow::animate(){
-  objects[2]->move(count); 
+  view->setFocus();
+  QWidget::setFocus();
+  int last = objects.size()-1;
+  bool gen = false;
+  objects[last]->move(count); 
+  if(objects[last]->vX == 1){
+   for(int i = 1; i<last; i++){
+    objects[i]->move(count);
+     if(i == (last-1) && (objects[last-1]->pos().x() - objects[last-2]->pos().x())>64){
+      QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground16.png");
+      objects[i-1]->setPixmap(*ground);
+     }
+     else if(objects[i]->pos().x() == -64){
+      cout<<i<<" "<<objects[i]->pos().x()<<endl;
+      scene->removeItem(objects.at(i));
+      objects.erase(objects.begin()+i);
+      gen = true;
+     }
+   }
+   if(gen == true){
+    int index = objects.size()-2;
+    int shift = objects[index]->pos().x();
+    cout<<"LAST: "<<objects[index]->pos().x()<<" "<<shift+64<<endl;
+    QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground1.png");
+    Ground *g  = new Ground(ground, shift+64, objects[index]->pos().y()); 
+    objects.insert(objects.end()-1, g);
+    scene->removeItem(objects.at(objects.size()-1));
+    scene->addItem(objects.at(objects.size()-2));
+    scene->addItem(objects.at(objects.size()-1));
+   }
+ }
   count++;
 }
 
@@ -28,7 +58,7 @@ void MainWindow::startGame(){
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e){
- objects[2]->keySignal(e);
+ objects[objects.size()-1]->keySignal(e);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *r){
@@ -36,8 +66,12 @@ void MainWindow::keyReleaseEvent(QKeyEvent *r){
   r->ignore();
  }
  else{
-  objects[2]->keyRelease(r);
+  objects[objects.size()-1]->keyRelease(r);
  }
+}
+
+void MainWindow::mouseEvent(QMouseEvent *m){
+ m->ignore();
 }
 
 /** MainWindow default constructor. A new scene is created a view is set to
@@ -131,25 +165,27 @@ MainWindow::MainWindow()  {
     timer->setInterval(4);
     timer->start();
     
-    
-    view->setFixedSize(3*WINDOW_MAX_X/2+75, 3*WINDOW_MAX_Y/2-34);
+    scene->setSceneRect(0, -3*WINDOW_MAX_Y/2+50, 3*WINDOW_MAX_X/2+96, 3*WINDOW_MAX_Y/2-4);
+    view->setFixedSize(3*WINDOW_MAX_X/2+100, 3*WINDOW_MAX_Y/2);
     viewLayout->addRow(view);
     view->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //view->setFocusPolicy(Qt::NoFocus);
     QWidget::setFocus();
     layout->addLayout(viewLayout, 1, 0, 9, 9);
     QPixmap *background = new QPixmap("/home/cs102/game_eirinber/Pictures/Background.png");
-    Background *b  = new Background(background, 0, -307); // Let’s pretend a default constructor
+    Background *b  = new Background(background, 0, -341); // Let’s pretend a default constructor
     objects.push_back(b);
-    QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground.png");
-    Ground *g  = new Ground(ground, 0, 0); // Let’s pretend a default constructor
+    QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground1.png");
+   for(int i = 1; i<=12; i++){
+    Ground *g  = new Ground(ground, (i-1)*64, 20); 
     objects.push_back(g);
+    }
     QPixmap *yoshi = new QPixmap("/home/cs102/game_eirinber/Pictures/YW1.png");
-    MainChar* m = new MainChar(yoshi, 10, -75); // Let’s pretend a default constructor
+    MainChar* m = new MainChar(yoshi, 10, -55); // Let’s pretend a default constructor
     objects.push_back(m);
     for (unsigned int i=0; i<objects.size(); i++ ) {
-     //objects[i]->move(); //What move method gets called?
      scene->addItem(objects.at(i));
     }
     setLayout(layout);

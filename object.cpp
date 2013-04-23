@@ -12,6 +12,6 @@ x = nx;
 y = ny;
 setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
 setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
-QGraphicsPixmapItem::setPos(x+500, y+500); //how you set the position
+QGraphicsPixmapItem::setPos(x, y); //how you set the position
 }
 
