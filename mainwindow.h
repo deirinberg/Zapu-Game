@@ -16,7 +16,6 @@
 #include <QTextEdit>
 #include <QListView>
 #include <QRadioButton>
-#include <QListView>
 #include <QTimer>
 #include <QGraphicsItemAnimation>
 #include <QPushButton>
@@ -27,8 +26,8 @@
 #include "foreground.h"
 #include "background.h"
 
-#define WINDOW_MAX_X 250
-#define WINDOW_MAX_Y 250
+#define WINDOW_MAX_X 506
+#define WINDOW_MAX_Y 466
 using namespace std;
 class MainWindow : public QWidget {
     Q_OBJECT
@@ -59,6 +58,7 @@ private:
     QGraphicsScene *scene;
     /** Holds/displays the scene which contains the tiles */
     QGraphicsView *view;
+    QGraphicsView *statusBar;
     /** Positions all of the buttons/text/text boxes in the window */
     QGridLayout *layout;
     /** Textbox for user to enter the size of the board */
@@ -100,7 +100,7 @@ private:
 protected:
  void keyPressEvent(QKeyEvent *e);
  void keyReleaseEvent(QKeyEvent *r);
- void mouseEvent(QMouseEvent *m);
+ void mousePressEvent(QMouseEvent *event);
 
 public slots:
     /** Starts the game when the appropriate button is pressed */

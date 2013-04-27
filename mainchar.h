@@ -312,7 +312,10 @@ void MainChar::jump(int num){
    cout<<"LOST IS TRUE\n";
   }
   if((yf-yi)>0 || ty < floor){
-  moveBy(0, yi-yf);
+    moveBy(0, yi-yf); 
+   if(pos().y() < -326){
+    moveBy(0, -pos().y()-326);
+   }
    if(ty > 100){
     walking = false;
    }

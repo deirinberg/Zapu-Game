@@ -9,6 +9,7 @@
 #include "background.h"
 #include "bullet.h"
 #include "ground.h"
+#include "ui.h"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ void MainWindow::clearSol(){
 }
 
 void MainWindow::animate(){
-  view->setFocus();
+  //view->setFocus();
   QWidget::setFocus();
   //int last = objects.size()-1;
   bool gen = false;
@@ -73,7 +74,9 @@ void MainWindow::animate(){
     fObjects[i]->move(count);
     if(fObjects[0]->collidesWithItem(fObjects[1])){
        //cout<<"YOSHI HIT A BULLET\n";
-      if(fObjects[0]->vX == 1 && (fObjects[0]->pos().x()-fObjects[1]->pos().x() > 43) && (fObjects[0]->pos().y()-10) < fObjects[1]->pos().y()){
+       //cout<<"VX: "<<fObjects[0]->vX<<endl;
+       //cout<<"Diff: "<<fObjects[0]->pos().x()-fObjects[1]->pos().x()<<endl;
+      if(fObjects[0]->vX == 1 && (fObjects[0]->pos().x() > fObjects[1]->pos().x()) && (fObjects[0]->pos().y()-10) < fObjects[1]->pos().y()){
          fObjects[0]->collideUp(0);
          fObjects[1]->collideDown(0);
        }
@@ -120,8 +123,13 @@ void MainWindow::keyReleaseEvent(QKeyEvent *r){
  }
 }
 
-void MainWindow::mouseEvent(QMouseEvent *m){
- m->ignore();
+void MainWindow::mousePressEvent(QMouseEvent *event){
+  cout<<"HERE\n";
+ if(event->pos().x() >= (WINDOW_MAX_X-66) && event->pos().x()<= WINDOW_MAX_X){
+   if(event->pos().y()>= 0 && event->pos().y() <= 55){
+    cout<<"PAUSE"<<endl;
+    }
+  }
 }
 
 /** MainWindow default constructor. A new scene is created a view is set to
@@ -140,12 +148,13 @@ void MainWindow::mouseEvent(QMouseEvent *m){
  *  @return nothing
  */
 MainWindow::MainWindow()  {
+    statusBar = new QGraphicsView();
     scene = new QGraphicsScene();
-    view = new QGraphicsView( scene );
-    layout = new QGridLayout(); 
+    view = new QGraphicsView(scene);
+    //layout = new QGridLayout(); 
     QFormLayout *viewLayout = new QFormLayout();
     
-    QFormLayout *messageLayout = new QFormLayout();
+ /* QFormLayout *messageLayout = new QFormLayout();
     message = new QLabel("", this);
     messageLayout->addRow(message);
     layout->addLayout(messageLayout, 0, 0, 1, 9);
@@ -187,8 +196,9 @@ MainWindow::MainWindow()  {
     
     start = new QPushButton("Start");
     connect( start, SIGNAL(clicked()), SLOT(startGame()) );
-    layout->addWidget(start, 6, 9, 1, 1);
+    layout->addWidget(start, 6, 9, 1, 1); 
     
+    ///// You'll need this later ///////
     quit = new QPushButton("Quit", this );
     connect( quit, SIGNAL(clicked()), qApp, SLOT(quit()) );
     layout->addWidget(quit, 6, 10, 1, 1);
@@ -205,10 +215,10 @@ MainWindow::MainWindow()  {
     cheatList->setMaximumWidth(127);
     cheatList->setMaximumHeight(153);
     layout->addWidget(cheatList, 8, 10, 1, 1);
-    
+    */
     count = 0;
     
-    updateCheat = false;
+ // updateCheat = false;
     
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
@@ -220,20 +230,26 @@ MainWindow::MainWindow()  {
     ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
     bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
     elec = new QPixmap(qApp->applicationDirPath() + "/Pictures/Bolt.png");
+    QPalette palette;
+    QPixmap world, status;
+    world.load(qApp->applicationDirPath()+"/Pictures/fullView.png");
+   /* status.load(qApp->applicationDirPath()+"/Pictures/StatusBarPause.png");  
+    statusBar->setFixedSize(WINDOW_MAX_X, 61);
+    palette.setBrush(statusBar->backgroundRole(), status);
+    statusBar->setPalette(palette);
+    viewLayout->addRow(statusBar);
+    viewLayout->setVerticalSpacing(0);*/
     
-    scene->setSceneRect(0, -3*WINDOW_MAX_Y/2+50, 3*WINDOW_MAX_X/2+96, 3*WINDOW_MAX_Y/2-4);
-    view->setFixedSize(3*WINDOW_MAX_X/2+100, 3*WINDOW_MAX_Y/2);
+    scene->setSceneRect(0, -WINDOW_MAX_Y+50, WINDOW_MAX_X-4, WINDOW_MAX_Y-4);
+    view->setFixedSize(WINDOW_MAX_X, WINDOW_MAX_Y);
     viewLayout->addRow(view);
     view->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    QPalette palette;
-    QPixmap world;
-    world.load(qApp->applicationDirPath()+"/Pictures/Background.png");
     palette.setBrush(view->backgroundRole(), world);
     view->setPalette(palette);
     QWidget::setFocus();
-    layout->addLayout(viewLayout, 1, 0, 9, 9);
+    //layout->addLayout(viewLayout, 1, 0, 9, 9);
 
     //World *w  = new World(world, 0, -341); // Let’s pretend a default constructor
     //bObjects.push_back(w);
@@ -250,7 +266,14 @@ MainWindow::MainWindow()  {
      scene->addItem(bObjects.at(i));
     }
     scene->addItem(fObjects.at(0));
-    setLayout(layout);
+    QPixmap *eggs;
+    UI *uiItem;
+    for(int i = 0; i<3; i++){
+     eggs = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
+     uiItem = new UI(eggs, i*34+92, -396, true);
+     scene->addItem(uiItem);
+    }
+    setLayout(viewLayout);
     
 }
 
@@ -269,7 +292,7 @@ void MainWindow::show() {
  */
 MainWindow::~MainWindow(){
     delete timer;
-    delete message;
+ /* delete message;
     delete sizeEdit;
     delete startMovesEdit;
     delete randomSeedEdit;
@@ -280,7 +303,7 @@ MainWindow::~MainWindow(){
     delete quit;
     delete clear;
     delete cheatList;
-    delete layout;
+    delete layout;*/
     delete scene;
     delete view;
 }
