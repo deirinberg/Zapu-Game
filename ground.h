@@ -1,28 +1,25 @@
 #ifndef GROUND_H
 #define GROUND_H
 #include "object.h"
-#include "mainchar.h"
+#include "background.h"
 
-class Ground: public Object {
+class Ground: public Background {
  public:
  Ground (QPixmap *pm, int nx, int ny);
  void move(int count); // Implement the move method
  void setGround(int y);
  void setInitial();
+ void setLimit(int num);
  void newImage(int max);
  void keySignal(QKeyEvent *e);
  void keyRelease(QKeyEvent *r);
  void getVx();
+ int limit;
  bool continuous;
 };
 
-Ground::Ground( QPixmap *pm, int nx, int ny ) : Object( pm, nx, ny ) {
-if(nx < 700){
- newImage(12);
- }
-else{
- newImage(18);
-}
+Ground::Ground( QPixmap *pm, int nx, int ny ) : Background( pm, nx, ny ) {
+
 }
 void Ground::move(int count) {
  if(count%3 == 0){
@@ -30,54 +27,61 @@ void Ground::move(int count) {
  }
 }
 
+void Ground::setLimit(int num){
+  newImage(num);
+}
+
 void Ground::newImage(int max){
- QPixmap *p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground1.png");
+ QPixmap *p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
  srand(time(NULL));
  int pic = rand()%max;
  cout<<pic<<endl;
 
   switch(pic){
-  case 0: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground2.png"); break;
-  case 1: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground3.png"); break;
-  case 2: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground4.png"); break;
-  case 3: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground5.png"); break;
-  case 4: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground6.png"); break;
-  case 5: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground7.png"); break;
-  case 6: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground8.png"); break;
-  case 7: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground9.png"); break;
-  case 8: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground10.png"); break;
-  case 9: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground11.png"); break;
-  case 10: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground12.png"); break;
-  case 11: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground13.png"); break;
-  case 12: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground14.png"); break;
-  default: p = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground15.png"); 
+  case 0: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground2.png"); break;
+  case 1: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground3.png"); break;
+  case 2: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground4.png"); break;
+  case 3: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground5.png"); break;
+  case 4: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground6.png"); break;
+  case 5: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground7.png"); break;
+  case 6: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground8.png"); break;
+  case 7: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground9.png"); break;
+  case 8: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground10.png"); break;
+  case 9: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground11.png"); break;
+  case 10: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground12.png"); break;
+  case 11: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground13.png"); break;
+  case 12: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground14.png"); break;
+  default: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground15.png"); 
+    int shiftX = 128;
+    if(pic%3 != 0){
+     shiftX = 96;
+    }
     if(pos().y() == 20){
      if(pic%2 == 1){
-      setPos(pos().x()+128, pos().y()-21);
+      setPos(pos().x()+shiftX, pos().y()-17);
      }
      else{
-     setPos(pos().x()+128, pos().y()-41);
+     setPos(pos().x()+shiftX, pos().y()-34);
      }
     }
-    else if(pos().y() == -1){
+    else if(pos().y() == 3){
      if(pic%2 == 1){
-     setPos(pos().x()+128, pos().y()+21);
+     setPos(pos().x()+shiftX, pos().y()+17);
      }
      else{
-     setPos(pos().x()+128, pos().y()-20);
+     setPos(pos().x()+shiftX, pos().y()-17);
      }
     }
-    else if(pos().y() == -21){
+    else if(pos().y() == -14){
      if(pic%2 == 1){
-     setPos(pos().x()+128, pos().y()+41);
+     setPos(pos().x()+shiftX, pos().y()+17);
      }
      else{
-     setPos(pos().x()+128, pos().y()+20);
+     setPos(pos().x()+shiftX, pos().y()+34);
      }
     }
     break;
   }
-// }
  setPixmap(*p);
 }
 

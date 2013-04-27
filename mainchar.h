@@ -1,18 +1,21 @@
 #ifndef MAINCHAR_H
 #define MAINCHAR_H
-#include "object.h"
+#include "foreground.h"
 #include <cmath>
 
-class MainChar: public Object {
+class MainChar: public Foreground {
  public:
  MainChar (QPixmap *pm, int nx, int ny);
  void move(int count); 
  void keySignal(QKeyEvent *e);
  void keyRelease(QKeyEvent *r);
  void setGround(int y);
+ void collideUp(int num);
+ void collideDown(int num);
  void walk();
  void crouch();
- void jump();
+ void hurting();
+ void jump(int num);
  int num;
  int vY;
  int floor;
@@ -22,43 +25,117 @@ class MainChar: public Object {
  bool stopWalking;
  bool walking;
  bool pause;
+ bool lost;
  bool jumping;
  bool dj;
  bool doubleJump;
  bool egg;
+ private:
+ QPixmap *yw1;
+ QPixmap *yw2;
+ QPixmap *yw3;
+ QPixmap *yw4;
+ QPixmap *yw5;
+ QPixmap *yw6;
+ QPixmap *yw7;
+ QPixmap *yw8;
+ QPixmap *jump1;
+ QPixmap *jump2;
+ QPixmap *jump3;
+ QPixmap *jump4;
+ QPixmap *jump5;
+ QPixmap *jump6;
+ QPixmap *jump7;
+ QPixmap *jump8;
+ QPixmap *jump9;
+ QPixmap *jump10;
+ QPixmap *jump11;
+ QPixmap *egg2;
+ QPixmap *hurt;
 };
 
-MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Object( pm, nx, ny ) {
+MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  floor = 0;
  num = 0;
  vX = 0;
  vY = 0;
+ setZValue(2);
  walking = false;
  egg = false;
  fall = false;
  jumping = false;
  doubleJump = false;
  stopWalking = false;
+ lost = false;
  pause = false;
+ yw1 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
+ yw2 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW2.png");
+ yw3 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW3.png");
+ yw4 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW4.png");
+ yw5 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW5.png");
+ yw6 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW6.png");
+ yw7 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW7.png");
+ yw8 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW8.png");
+ jump1 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump1.png");
+ jump2 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump2.png");
+ jump3 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump3.png");
+ jump4 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump4.png");
+ jump5 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump5.png");
+ jump6 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump6.png");
+ jump7 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump7.png");
+ jump8 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump8.png");
+ jump9 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump9.png");
+ jump10 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump10.png");
+ jump11 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Jump11.png");
+ egg2 = new QPixmap(qApp->applicationDirPath()+"/Pictures/Egg2.png");
+ hurt = new QPixmap(qApp->applicationDirPath()+"/Pictures/Hurt.png");
 }
 void MainChar::move(int count) {
-if(count%40 == 0){
- if(walking == true){
-  egg = false;
-  jumping = false;
-  dj = false;
-  doubleJump = false;
-  walk();
- }
- else if(egg == true && num <=2){
-  crouch();
+if(lost == false){
+ if(count%60 == 0){
+  if(walking == true){
+   egg = false;
+   jumping = false;
+   dj = false;
+   doubleJump = false;
+   walk();
+  }
+  else if(egg == true && num <=2){
+   crouch();
+  }
  }
 }
-if(count%4 == 0){
+ if(count%4 == 0){
+  if(jumping == true){
+   jump(50);
+  }
+ }
+}
+
+void MainChar::collideUp(int num){
+ //bullet case
+ if(lost == false && num == 0){
+  jumping = true;
+  time = 0;
+  cout<<"YOSHI SHOULD JUMP\n";
+  jump(30);
+ }
+}
+
+void MainChar::collideDown(int num){
+//bullet case
+ if(num == 0){
+  walking = false;
+  lost = true;
  if(jumping == true){
-  jump();
+  doubleJump = true;
+  jump(0);
  }
-}
+ else if(pos().y() == (floor-55)){
+  moveBy(0, -6);
+ }
+  hurting();
+ }
 }
 
 void MainChar::keySignal(QKeyEvent *e){
@@ -142,39 +219,40 @@ void MainChar::keyRelease(QKeyEvent *e){
   }
 }
 
-void MainChar::setGround(int y){
-if(fall == false){
- if(y == 20){
-  //cout<<"FIRST LEVEL\n";
+void MainChar::setGround(int num){
+ if(pos().y() <= 20 && num == 20){
   floor = 0;
  }
- else if(y == -1){
-  //cout<<"SECOND LEVEL\n";
-  floor = -21;
+ else if(pos().y() <= 3 && num == 3){
+  floor = -17;
  }
- else if(y == -21){
-  floor = -41;
+ else if(pos().y() <= -14 && num == -14){
+  floor = -34;
  }
- else if(y > 20){
-  //cout<<"GAP LEVEL\n";
+ else if(num > 20){
   floor = 10000;
  }
 }
-}
 void MainChar::crouch(){
- QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Egg2.png");
- setPixmap(*pm);
+ setPixmap(*egg2);
 }
 
-void MainChar::jump(){
-  QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump1.png");
-  int vi = 50;
+void MainChar::hurting(){
+ setPixmap(*hurt);
+ walking = false;
+ vX = 0;
+ egg = false;
+}
+
+void MainChar::jump(int num){
+  QPixmap *pm = jump1;
+  int vi = num;
   if(fall == true){
     walking = false;
     vi = 0;
   }
   else if(doubleJump == true){
-    vi = 50;
+    vi = num;
    if(dj == true){
     time = 0;
     dj = false;
@@ -194,39 +272,44 @@ void MainChar::jump(){
    int pic = (int)t;
     switch(pic){
      case 1: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump4.png"); break;
+      pm = jump4; break;
      case 2: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump5.png"); break;
+      pm = jump5; break;
      case 3: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump6.png"); break;
+      pm = jump6; break;
      case 4: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump7.png"); break;
+      pm = jump7; break;
      case 5: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump8.png"); break;
+      pm = jump8; break;
      case 6: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump9.png"); break;
+      pm = jump9; break;
      case 7: 
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump10.png"); break;
+      pm = jump10; break;
      default:
-      pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump11.png"); break;
+      pm = jump11; break;
     }
   }
   else if(doubleJump == true){
-    pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump3.png");
+    pm = jump3;
   }
   if(ty == 0 && doubleJump == false){
-   pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump1.png");
+   pm = jump1;
   }
   else if((yi-yf)>0 && doubleJump == false){
-   pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump3.png");
+   pm = jump3;
   }
   else if(doubleJump == false){
-   pm = new QPixmap("/home/cs102/game_eirinber/Pictures/Jump2.png");
+   pm = jump2;
   }
   ty += (yi-yf);
-  cout<<ty<<endl;
+  //cout<<"TY: "<<ty<<endl;
   if(ty > 10){
    floor = 10000;
+  }
+  if(ty > 110){
+   lost = true;
+   vX = 0;
+   cout<<"LOST IS TRUE\n";
   }
   if((yf-yi)>0 || ty < floor){
   moveBy(0, yi-yf);
@@ -235,7 +318,13 @@ void MainChar::jump(){
    }
   }
   else{
+   if(lost == false){
    setPos(pos().x(), floor-55);
+   }
+   else{
+   cout<<"GOOD VUN\n";
+   setPos(pos().x(), floor-72);
+   }
    jumping = false;
    dj = false;
    doubleJump = false;
@@ -243,9 +332,11 @@ void MainChar::jump(){
     walking = true;
     pause = false;
    }
-   pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW1.png");
+   pm = yw1;
   }
+ if(lost == false){
   setPixmap(*pm);
+  }
 }
 
 void MainChar::walk(){
@@ -255,15 +346,15 @@ void MainChar::walk(){
   jumping = true;
  }
  else{
-  QPixmap *pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW1.png");
+  QPixmap *pm = yw1;
   switch(num){
-   case 1: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW2.png"); break;
-   case 2: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW3.png"); break;
-   case 3: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW4.png"); break;
-   case 4: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW5.png"); break;
-   case 5: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW6.png"); break;
-   case 6: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW7.png"); break;
-   case 7: pm = new QPixmap("/home/cs102/game_eirinber/Pictures/YW8.png"); break;
+   case 1: pm = yw2; break;
+   case 2: pm = yw3; break;
+   case 3: pm = yw4; break;
+   case 4: pm = yw5; break;
+   case 5: pm = yw6; break;
+   case 6: pm = yw7; break;
+   case 7: pm = yw8; break;
    }
    if(num <= 6){
     num++;

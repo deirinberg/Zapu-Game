@@ -23,8 +23,9 @@
 #include <vector>
 #include <QKeyEvent>
 #include <QMouseEvent>
-#include <QAbstractScrollArea>
-#include "object.h"
+#include <QPixmap>
+#include "foreground.h"
+#include "background.h"
 
 #define WINDOW_MAX_X 250
 #define WINDOW_MAX_Y 250
@@ -84,8 +85,15 @@ private:
     QStringListModel *model;
     /** Displays errors or messages to user */
     QLabel *message;
-
-    vector<Object*> objects;
+    
+    QPixmap *ground1;
+    QPixmap *ground16;
+    QPixmap *bulletBill;
+    QPixmap *elec;
+    
+    vector<Foreground*> fObjects;
+    vector<Foreground*> zObjects;
+    vector<Background*> bObjects;
     /** Timer to animate the movement of tiles */
     QTimer *timer;
     

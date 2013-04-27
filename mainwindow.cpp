@@ -5,7 +5,9 @@
 #include <QtAlgorithms>
 #include <QFile>
 #include "mainchar.h"
+#include "bolt.h"
 #include "background.h"
+#include "bullet.h"
 #include "ground.h"
 
 using namespace std;
@@ -21,41 +23,77 @@ void MainWindow::clearSol(){
 void MainWindow::animate(){
   view->setFocus();
   QWidget::setFocus();
-  int last = objects.size()-1;
+  //int last = objects.size()-1;
   bool gen = false;
-  objects[last]->move(count); 
-  if(objects[last]->vX == 1){
-   for(int i = 1; i<last; i++){
-    objects[i]->move(count);
-    if(i == 1){
-     int floor =  floor = objects[i]->pos().y();
-      if(objects[i]->pos().x() <-24 && (objects[i+1]->pos().x()>82)){
+  fObjects[0]->move(count); 
+  if(fObjects[0]->vX == 1){
+   for(unsigned int i = 0; i<bObjects.size(); i++){
+    bObjects[i]->move(count);
+    if(i == 0){
+     int floor = bObjects[i]->pos().y();
+      if(bObjects[i]->pos().x() <-24 && (bObjects[i+1]->pos().x()>82)){
         floor = 500;
        }
-       objects[last]->setGround(floor);
+       fObjects[0]->setGround(floor);
      }
-     if(i == (last-1) && (objects[last-1]->pos().x() - objects[last-2]->pos().x())>64){
-      QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground16.png");
-      objects[i-1]->setPixmap(*ground);
+     int last = bObjects.size()-1;
+     //cout<<bObjects[last]->pos().x()<<endl;
+     if(i == last && (bObjects[last]->pos().x() - bObjects[last-1]->pos().x())>64){
+      bObjects[i-1]->setPixmap(*ground16);
      }
-     else if(objects[i]->pos().x() == -64){
-      cout<<i<<" "<<objects[i]->pos().x()<<endl;
-      scene->removeItem(objects.at(i));
-      objects.erase(objects.begin()+i);
+     else if(bObjects[i]->pos().x() == -64){
+      //cout<<i<<" "<<bObjects[i]->pos().x()<<endl;
+      scene->removeItem(bObjects.at(i));
+      bObjects.erase(bObjects.begin()+i);
       gen = true;
      }
-   }
+   } //end for loop for ground items
+    
    if(gen == true){
-    int index = objects.size()-2;
-    int shift = objects[index]->pos().x();
-    cout<<"LAST: "<<objects[index]->pos().x()<<" "<<shift+64<<endl;
-    QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground1.png");
-    Ground *g  = new Ground(ground, shift+64, objects[index]->pos().y()); 
-    objects.insert(objects.end()-1, g);
-    scene->removeItem(objects.at(objects.size()-1));
-    scene->addItem(objects.at(objects.size()-2));
-    scene->addItem(objects.at(objects.size()-1));
+    int shift = bObjects[bObjects.size()-1]->pos().x();
+    Ground *g  = new Ground(ground1, shift+64, bObjects[bObjects.size()-1]->pos().y()); 
+    if(fObjects.size() == 1){
+     g->setLimit(18);
+    }
+    else{
+     g->setLimit(12);
+     cout<<"DECREASED LIMIT\n";
+    }
+    bObjects.push_back(g);
+    scene->addItem(bObjects.at(bObjects.size()-1));
+   }//end ground items
+ }
+ if(count!= 0 && count%4000==0){
+    cout<<"NEW ENEMY\n";
+    Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
+    fObjects.push_back(b);
+    scene->addItem(fObjects[fObjects.size()-1]);
+ }
+  for(unsigned int i = 1; i<fObjects.size(); i++){
+    fObjects[i]->move(count);
+    if(fObjects[0]->collidesWithItem(fObjects[1])){
+       //cout<<"YOSHI HIT A BULLET\n";
+      if(fObjects[0]->vX == 1 && (fObjects[0]->pos().x()-fObjects[1]->pos().x() > 43) && (fObjects[0]->pos().y()-10) < fObjects[1]->pos().y()){
+         fObjects[0]->collideUp(0);
+         fObjects[1]->collideDown(0);
+       }
+       else {
+         fObjects[0]->collideDown(0);
+         fObjects[1]->collideUp(0);
+       }
+     }
+    if(fObjects[i]->pos().x()<-100 || fObjects[i]->pos().y()>110){
+     cout<<"REMOVE BULLET\n";
+     scene->removeItem(fObjects[i]);
+     fObjects.erase(fObjects.begin()+i);
+    }
    }
+ for(unsigned int i = 0; i<zObjects.size(); i++){
+    zObjects[i]->move(count);
+    if(zObjects[i]->pos().x()>500){
+     scene->removeItem(zObjects[i]);
+     zObjects.erase(zObjects.begin()+i);
+    }
  }
   count++;
 }
@@ -65,7 +103,12 @@ void MainWindow::startGame(){
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e){
- objects[objects.size()-1]->keySignal(e);
+ fObjects[0]->keySignal(e);
+ if(!e->isAutoRepeat() && e->key() == Qt::Key_Space){
+   Bolt *b  = new Bolt(elec, 77, fObjects[0]->pos().y()+3);
+   zObjects.push_back(b);
+   scene->addItem(b);
+ }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *r){
@@ -73,7 +116,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *r){
   r->ignore();
  }
  else{
-  objects[objects.size()-1]->keyRelease(r);
+  fObjects[0]->keyRelease(r);
  }
 }
 
@@ -169,8 +212,14 @@ MainWindow::MainWindow()  {
     
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
-    timer->setInterval(4);
+    timer->setInterval(3);
     timer->start();
+    
+    
+    ground1 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground1.png");
+    ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
+    bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
+    elec = new QPixmap(qApp->applicationDirPath() + "/Pictures/Bolt.png");
     
     scene->setSceneRect(0, -3*WINDOW_MAX_Y/2+50, 3*WINDOW_MAX_X/2+96, 3*WINDOW_MAX_Y/2-4);
     view->setFixedSize(3*WINDOW_MAX_X/2+100, 3*WINDOW_MAX_Y/2);
@@ -178,23 +227,29 @@ MainWindow::MainWindow()  {
     view->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //view->setFocusPolicy(Qt::NoFocus);
+    QPalette palette;
+    QPixmap world;
+    world.load(qApp->applicationDirPath()+"/Pictures/Background.png");
+    palette.setBrush(view->backgroundRole(), world);
+    view->setPalette(palette);
     QWidget::setFocus();
     layout->addLayout(viewLayout, 1, 0, 9, 9);
-    QPixmap *background = new QPixmap("/home/cs102/game_eirinber/Pictures/Background.png");
-    Background *b  = new Background(background, 0, -341); // Let’s pretend a default constructor
-    objects.push_back(b);
-    QPixmap *ground = new QPixmap("/home/cs102/game_eirinber/Pictures/Ground1.png");
+
+    //World *w  = new World(world, 0, -341); // Let’s pretend a default constructor
+    //bObjects.push_back(w);
+    QPixmap *ground = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
    for(int i = 1; i<=12; i++){
     Ground *g  = new Ground(ground, (i-1)*64, 20); 
-    objects.push_back(g);
+    g->setLimit(12);
+    bObjects.push_back(g);
     }
-    QPixmap *yoshi = new QPixmap("/home/cs102/game_eirinber/Pictures/YW1.png");
+    QPixmap *yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
     MainChar* m = new MainChar(yoshi, 10, -55); // Let’s pretend a default constructor
-    objects.push_back(m);
-    for (unsigned int i=0; i<objects.size(); i++ ) {
-     scene->addItem(objects.at(i));
+    fObjects.push_back(m);
+    for (unsigned int i=0; i<bObjects.size(); i++ ) {
+     scene->addItem(bObjects.at(i));
     }
+    scene->addItem(fObjects.at(0));
     setLayout(layout);
     
 }

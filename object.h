@@ -6,11 +6,7 @@
 class Object: public QGraphicsPixmapItem {
 public:
 Object (QPixmap *pm, int nx, int ny);
-virtual void move(int count) = 0; //virtual function. Class Thing is abstract. For a reason.
-virtual void keySignal(QKeyEvent *e) = 0;
-virtual void keyRelease(QKeyEvent *r) = 0;
-virtual void setGround(int y) = 0;
-//virtual int getvX() = 0;
+virtual void move(int count) = 0; //virtual function.
 int x;
 int y;
 int vX;
