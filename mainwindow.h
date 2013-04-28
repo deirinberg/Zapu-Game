@@ -26,6 +26,8 @@
 #include "foreground.h"
 #include "background.h"
 
+class UI;
+
 #define WINDOW_MAX_X 506
 #define WINDOW_MAX_Y 466
 using namespace std;
@@ -47,12 +49,20 @@ public:
     int dx;
     /** Y distance tile needs to move during animation */
     int dy;
+    int floor;
+    int points;
+    int numLives;
+    int rCount;
     /** True or false based on if cheat can be cleared or not */
     bool updateCheat;
     /** Shows all items which are added to the QWidget */
     void show();
     /** Clears the cheat in the text box if it exists */
+    bool resetting;
     void clearCheat();
+    void reset();
+    void updateScore();
+    QPixmap* scoreImage(int num);
 private:
     /** Where all tiles are added to */
     QGraphicsScene *scene;
@@ -90,10 +100,24 @@ private:
     QPixmap *ground16;
     QPixmap *bulletBill;
     QPixmap *elec;
+    QPixmap *zero;
+    QPixmap *one;
+    QPixmap *two;
+    QPixmap *three;
+    QPixmap *four;
+    QPixmap *five;
+    QPixmap *six;
+    QPixmap *seven;
+    QPixmap *eight;
+    QPixmap *nine;
+    
     
     vector<Foreground*> fObjects;
     vector<Foreground*> zObjects;
     vector<Background*> bObjects;
+    vector<UI*>eggs;
+    vector<UI*>score;
+    
     /** Timer to animate the movement of tiles */
     QTimer *timer;
     

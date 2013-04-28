@@ -24,14 +24,26 @@ void MainWindow::clearSol(){
 void MainWindow::animate(){
   //view->setFocus();
   QWidget::setFocus();
-  //int last = objects.size()-1;
   bool gen = false;
+
+  if(fObjects[0]->vX == -2 && rCount == 0){
+   rCount = count;
+   resetting = true;
+  }
+  else if(fObjects[0]->vX == -2 && (rCount+400) == count){
+   rCount = 0;
+   reset();
+  } 
+  
+  if(resetting == false){
   fObjects[0]->move(count); 
-  if(fObjects[0]->vX == 1){
+  }
+  if(fObjects[0]->vX == 1 || resetting == true){
+  //cout<<"IN DISSS\n";
    for(unsigned int i = 0; i<bObjects.size(); i++){
     bObjects[i]->move(count);
     if(i == 0){
-     int floor = bObjects[i]->pos().y();
+      floor = bObjects[i]->pos().y();
       if(bObjects[i]->pos().x() <-24 && (bObjects[i+1]->pos().x()>82)){
         floor = 500;
        }
@@ -48,6 +60,16 @@ void MainWindow::animate(){
       bObjects.erase(bObjects.begin()+i);
       gen = true;
      }
+     else if(bObjects[i]->pos().x() == 0 && resetting == true && timer->isActive()){
+        cout<<i<<" "<<bObjects[i]->pos().x()<<" "<<floor<<endl;
+        cout<<"STOPPING\n";
+        QPixmap *yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
+        MainChar* m = new MainChar(yoshi, 10, floor-75); // Let’s pretend a default constructor
+        fObjects.push_back(m);
+        fObjects[0]->setGround(floor);
+        scene->addItem(fObjects[0]);
+        resetting = false;
+      }
    } //end for loop for ground items
     
    if(gen == true){
@@ -64,46 +86,56 @@ void MainWindow::animate(){
     scene->addItem(bObjects.at(bObjects.size()-1));
    }//end ground items
  }
- if(count!= 0 && count%4000==0){
+if(resetting == false){
+  if(count!= 0 && count%4000==0){
     cout<<"NEW ENEMY\n";
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
     fObjects.push_back(b);
     scene->addItem(fObjects[fObjects.size()-1]);
- }
-  for(unsigned int i = 1; i<fObjects.size(); i++){
-    fObjects[i]->move(count);
-    if(fObjects[0]->collidesWithItem(fObjects[1])){
-       //cout<<"YOSHI HIT A BULLET\n";
-       //cout<<"VX: "<<fObjects[0]->vX<<endl;
-       //cout<<"Diff: "<<fObjects[0]->pos().x()-fObjects[1]->pos().x()<<endl;
-      if(fObjects[0]->vX == 1 && (fObjects[0]->pos().x() > fObjects[1]->pos().x()) && (fObjects[0]->pos().y()-10) < fObjects[1]->pos().y()){
-         fObjects[0]->collideUp(0);
-         fObjects[1]->collideDown(0);
-       }
-       else {
-         fObjects[0]->collideDown(0);
-         fObjects[1]->collideUp(0);
-       }
+  }
+   for(unsigned int i = 1; i<fObjects.size(); i++){
+     fObjects[i]->move(count);
+     if(fObjects[0]->collidesWithItem(fObjects[1])){
+        //cout<<"YOSHI HIT A BULLET\n";
+        //cout<<"VX: "<<fObjects[0]->vX<<endl;
+        //cout<<"Diff: "<<fObjects[0]->pos().x()-fObjects[1]->pos().x()<<endl;
+       if(fObjects[0]->vX != -2 && (fObjects[0]->pos().x() > fObjects[1]->pos().x()) && (fObjects[0]->pos().y()-10) < fObjects[1]->pos().y()){
+          fObjects[0]->collideUp(0);
+          fObjects[1]->collideDown(0);
+        }
+        else {
+          fObjects[0]->collideDown(0);
+          fObjects[1]->collideUp(0);
+        }
+      }
+     if(fObjects[i]->pos().x()<-100 || fObjects[i]->pos().y()>110){
+      cout<<"REMOVE BULLET\n";
+      scene->removeItem(fObjects[i]);
+      fObjects.erase(fObjects.begin()+i);
      }
-    if(fObjects[i]->pos().x()<-100 || fObjects[i]->pos().y()>110){
-     cout<<"REMOVE BULLET\n";
-     scene->removeItem(fObjects[i]);
-     fObjects.erase(fObjects.begin()+i);
     }
-   }
- for(unsigned int i = 0; i<zObjects.size(); i++){
+   for(unsigned int i = 0; i<zObjects.size(); i++){
     zObjects[i]->move(count);
     if(zObjects[i]->pos().x()>500){
      scene->removeItem(zObjects[i]);
      zObjects.erase(zObjects.begin()+i);
     }
- }
+   }
+  if(fObjects[0]->pos().y() > 35){
+    reset();
+   }
+  if(fObjects[0]->vX == 1 && count%100 == 0){
+    points++;
+    updateScore();
+   }
+}
   count++;
 }
 
 void MainWindow::startGame(){
 
 }
+
 
 void MainWindow::keyPressEvent(QKeyEvent *e){
  fObjects[0]->keySignal(e);
@@ -128,8 +160,88 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
  if(event->pos().x() >= (WINDOW_MAX_X-66) && event->pos().x()<= WINDOW_MAX_X){
    if(event->pos().y()>= 0 && event->pos().y() <= 55){
     cout<<"PAUSE"<<endl;
-    }
+     if(timer->isActive()){
+       timer->stop();
+     }
+     else{
+      timer->start();
+     }
+  }}
+}
+
+void MainWindow::reset(){
+ resetting = true;
+ while(!fObjects.empty()){
+   scene->removeItem(fObjects.at(0));
+   cout<<"BEFORE SIZE: "<<fObjects.size()<<endl;
+   //delete fObjects.back();
+   fObjects.erase(fObjects.begin());
+   cout<<"AFTER SIZE: "<<fObjects.size()<<endl;
+ }
+ numLives--;
+ switch(numLives){
+  case 0: eggs[0]->setVisible(false); /* reset */
+  case 1: eggs[1]->setVisible(false);
+  case 2: eggs[2]->setVisible(false); break;
+  case 3: eggs[3]->setVisible(false); break;
+ }
+ if(numLives!=0){
+ 
   }
+ 
+}
+
+void MainWindow::updateScore(){
+   int thous, hunds, tens, ones;
+ if(points < 10){
+   score[0]->setPixmap(*scoreImage(points));
+ }
+ else if(points < 100){
+   tens = points/10;
+   ones = points%10;
+   score[0]->setPixmap(*scoreImage(tens));
+   score[1]->setVisible(true);
+   score[1]->setPixmap(*scoreImage(ones));
+ }
+ else if(points < 1000){
+   hunds = points/100;
+   tens = (points/10)%10;
+   ones = points%10;
+   score[0]->setPixmap(*scoreImage(hunds));
+   score[1]->setVisible(true);
+   score[1]->setPixmap(*scoreImage(tens));
+   score[2]->setVisible(true);
+   score[2]->setPixmap(*scoreImage(ones));
+ }
+ else if(points < 10000){
+   thous = points/1000;
+   hunds =  (points/100)%10;
+   tens = (points/10)%10;
+   ones = points%10;
+   score[0]->setPixmap(*scoreImage(thous));
+   score[1]->setPixmap(*scoreImage(hunds));
+   score[1]->setVisible(true);
+   score[2]->setPixmap(*scoreImage(tens));
+   score[2]->setVisible(true);
+   score[3]->setPixmap(*scoreImage(ones));
+   score[3]->setVisible(true);
+ }
+}
+
+QPixmap* MainWindow::scoreImage(int num){
+ QPixmap *p = zero;
+ switch(num){
+  case 1: p = one; break;
+  case 2: p = two; break;
+  case 3: p = three; break;
+  case 4: p = four; break;
+  case 5: p = five; break;
+  case 6: p = six; break;
+  case 7: p = seven; break;
+  case 8: p = eight; break;
+  case 9: p = nine; break;
+ }
+  return p;
 }
 
 /** MainWindow default constructor. A new scene is created a view is set to
@@ -217,7 +329,10 @@ MainWindow::MainWindow()  {
     layout->addWidget(cheatList, 8, 10, 1, 1);
     */
     count = 0;
-    
+    points = 0;
+    numLives = 3;
+    rCount = 0;
+    resetting = false;
  // updateCheat = false;
     
     timer = new QTimer(this);
@@ -225,7 +340,19 @@ MainWindow::MainWindow()  {
     timer->setInterval(3);
     timer->start();
     
-    
+    cout<<"HERE?\n";
+    zero = new QPixmap(qApp->applicationDirPath()+"/Pictures/0.png");
+    one = new QPixmap(qApp->applicationDirPath()+"/Pictures/1.png");
+    two = new QPixmap(qApp->applicationDirPath()+"/Pictures/2.png");
+    three = new QPixmap(qApp->applicationDirPath()+"/Pictures/3.png");
+    four = new QPixmap(qApp->applicationDirPath()+"/Pictures/4.png");
+    five = new QPixmap(qApp->applicationDirPath()+"/Pictures/5.png");
+    six = new QPixmap(qApp->applicationDirPath()+"/Pictures/6.png");
+    seven = new QPixmap(qApp->applicationDirPath()+"/Pictures/7.png");
+    eight = new QPixmap(qApp->applicationDirPath()+"/Pictures/8.png");
+    nine = new QPixmap(qApp->applicationDirPath()+"/Pictures/9.png");
+    cout<<"HERE??\n";    
+        
     ground1 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground1.png");
     ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
     bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
@@ -233,6 +360,7 @@ MainWindow::MainWindow()  {
     QPalette palette;
     QPixmap world, status;
     world.load(qApp->applicationDirPath()+"/Pictures/fullView.png");
+    
    /* status.load(qApp->applicationDirPath()+"/Pictures/StatusBarPause.png");  
     statusBar->setFixedSize(WINDOW_MAX_X, 61);
     palette.setBrush(statusBar->backgroundRole(), status);
@@ -266,13 +394,22 @@ MainWindow::MainWindow()  {
      scene->addItem(bObjects.at(i));
     }
     scene->addItem(fObjects.at(0));
-    QPixmap *eggs;
+    
+    QPixmap *bwEgg;
     UI *uiItem;
+    UI *num;
     for(int i = 0; i<3; i++){
-     eggs = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
-     uiItem = new UI(eggs, i*34+92, -396, true);
+     bwEgg = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
+     uiItem = new UI(bwEgg, i*34+92, -397, true);
+     eggs.push_back(uiItem);
      scene->addItem(uiItem);
     }
+    for(int j = 0; j<5; j++){
+     num = new UI(zero, j*15+309, -394, false);
+     score.push_back(num);
+     scene->addItem(num);
+    }
+    score[0]->setVisible(true);
     setLayout(viewLayout);
     
 }

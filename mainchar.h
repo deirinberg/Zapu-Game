@@ -240,7 +240,7 @@ void MainChar::crouch(){
 void MainChar::hurting(){
  setPixmap(*hurt);
  walking = false;
- vX = 0;
+ vX = -2;
  egg = false;
 }
 
@@ -309,7 +309,6 @@ void MainChar::jump(int num){
   if(ty > 110){
    lost = true;
    vX = 0;
-   cout<<"LOST IS TRUE\n";
   }
   if((yf-yi)>0 || ty < floor){
     moveBy(0, yi-yf); 
