@@ -19,7 +19,7 @@ Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
  int py = rand()%2;
  switch(py){
- case 0: py = -300; break;
+ case 0: py = -350; break;
  case 1: py = -280; break;
  }
  state = 0;
@@ -46,14 +46,14 @@ if(count%2 == 0){
 void Kamek::collideUp(int num){
  //yoshi case
  if(num == 0){
- 
+  setVisible(false);
  }
 }
 
 void Kamek::collideDown(int num){
 //yoshi case
  if(num == 0){
-  
+  setVisible(false);
  }
 }
 

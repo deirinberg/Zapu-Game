@@ -23,11 +23,15 @@ if(count%2 == 0){
 }
 
 void Bolt::collideUp(int num){
-
+ if(num!=-1){
+  setVisible(false);
+ }
 }
 
 void Bolt::collideDown(int num){
-
+ if(num!=-1){
+  setVisible(false);
+ }
 }
 
 

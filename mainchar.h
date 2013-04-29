@@ -13,7 +13,10 @@ class MainChar: public Foreground {
  void keySignal(QKeyEvent *e);
  void keyRelease(QKeyEvent *r);
  void setVX(int vx);
+ int getVY();
  void setGround(int y);
+ int getGround();
+ void setState(int s);
  void collideUp(int num);
  void collideDown(int num);
  void walk();
@@ -97,9 +100,10 @@ MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 }
 void MainChar::move(int count) {
 if(lost == false){
- if(count%60 == 0){
+ if(count%50 == 0){
   if(walking == true && vX > 0){
    state = 0;
+   vY = 0;
    egg = false;
    jumping = false;
    dj = false;
@@ -108,6 +112,7 @@ if(lost == false){
   }
   else if(egg == true && num <=2){
    crouch();
+   vY = 0;
   }
  }
 }
@@ -167,8 +172,10 @@ void MainChar::keySignal(QKeyEvent *e){
      if(jumping == false && egg == false && stopWalking == false){
       walking = true;
       vX = 1;
+      vY = 0;
      }
      else if(jumping == false && egg == false){
+      vY = 0;
       vX = 0;
       num = 0;
       walk();
@@ -188,6 +195,7 @@ void MainChar::keySignal(QKeyEvent *e){
    case Qt::Key_Left:
       walking = false;
       vX = 0;
+      vY = 0;
       cout<<"LEFT KEY\n"; 
       break;
    case Qt::Key_Space:
@@ -225,22 +233,30 @@ void MainChar::keyRelease(QKeyEvent *e){
      break;
   }
 }
+int MainChar::getVY(){
+ return vY;
+}
 
 void MainChar::setVX(int vx){
  cout<<"WHAT "<<vx<<endl;
  vX = vx;
+ vY = 0;
  if(vX != -2){
   cout<<"INN HEERRE\n";
   walking = false;
   egg = false;
-  fall = false;
   jumping = false;
+  fall = false;
   doubleJump = false;
   stopWalking = false;
   lost = false;
   pause = false;
   state = 0;
  }
+}
+
+void MainChar::setState(int s){
+ state = s;
 }
 
 void MainChar::setGround(int num){
@@ -256,6 +272,9 @@ void MainChar::setGround(int num){
  else if(num > 20){
   floor = 10000;
  }
+}
+int MainChar::getGround(){
+ return floor;
 }
 void MainChar::crouch(){
  state = -1;
@@ -275,7 +294,9 @@ void MainChar::jump(int num){
   int vi = num;
   if(fall == true){
     walking = false;
+   if(vX != -2){
     vi = 0;
+   }
   }
   else if(doubleJump == true){
     vi = num;
@@ -287,10 +308,10 @@ void MainChar::jump(int num){
   float yi = vi*time + -5*time*time;
   time += .1;
   float yf = vi*time + -5*time*time;
-  if((yi-yf) < 0){
+  if(vX!=-2 && (yi-yf) < 0){
     vY = -1;
   }
-  else if((yi-yf) > 0){
+  else if(vX != -2 && (yi-yf) > 0){
     vY = 1;
   }
   if(doubleJump == true && (yi - yf)<0){
@@ -346,6 +367,9 @@ void MainChar::jump(int num){
    }
   }
   else{
+  if(vX!=-2){
+    vY = 0;
+   }
    if(lost == false){
    setPos(pos().x(), floor-55);
    }

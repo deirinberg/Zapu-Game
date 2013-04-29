@@ -1,15 +1,13 @@
 #ifndef BULLET_H
 #define BULLET_H
 #include "foreground.h"
+#include <time.h>
 
 class Bullet: public Foreground {
  public:
  Bullet (QPixmap *pm, int nx, int ny);
  void move(int count); // Implement the move method
  void sink();
- void setGround(int y);
- void keySignal(QKeyEvent *e);
- void keyRelease(QKeyEvent *r);
  void collideUp(int num);
  void collideDown(int num);
  bool sinking;
@@ -17,13 +15,19 @@ class Bullet: public Foreground {
 
 Bullet::Bullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
- int py = rand()%3+1;
- switch(py){
- case 1: py = -200; break;
- case 2: py = -100; break;
- case 3: py = -70; break;
+ int py = rand()%9;
+ cout<<"PY: "<<py<<"\n";
+ if(py<=2){
+ py = -100;
  }
- cout<<"PY: "<<py<<endl;
+ else if(py<=5){
+ py = -70;
+ }
+ else{
+ py = -200;
+ }
+ state = 2;
+ cout<<"Height: "<<py<<endl;
  setPos(768, py);
  setZValue(2);
  sinking = false;

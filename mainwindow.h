@@ -54,11 +54,13 @@ public:
     int points;
     int numLives;
     int rCount;
+    int genCount;
     /** True or false based on if cheat can be cleared or not */
     bool updateCheat;
     /** Shows all items which are added to the QWidget */
     void show();
     /** Clears the cheat in the text box if it exists */
+    void newGame();
     bool resetting;
     bool spiked;
     bool bounceBack;
@@ -110,6 +112,7 @@ private:
     QPixmap *ground16;
     QPixmap *bulletBill;
     QPixmap *witch;
+    QPixmap *bWalk;
     QPixmap *spikeBall;
     QPixmap *elec;
     QPixmap *zero;

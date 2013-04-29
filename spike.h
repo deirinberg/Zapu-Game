@@ -19,7 +19,7 @@ Spike::Spike( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  bounce = false;
  ty = 0;
  time = 0;
- setZValue(3);
+ setZValue(4);
 }
 void Spike::move(int count) {
 if(count%4 == 0){
@@ -27,7 +27,7 @@ if(count%4 == 0){
    fall(0);
   }
   else{
-   fall(80);
+   fall(65);
   }
 }
 }
@@ -49,9 +49,8 @@ int vi = vy;
 }
 
 void Spike::collideUp(int num){
- //yoshi case
  if(num == 0){
- 
+  setVisible(false);
  }
 }
 
@@ -60,6 +59,9 @@ void Spike::collideDown(int num){
  if(num == 1){
   time = 0;
   bounce = true;
+ }
+ else if(num == 0){
+  setVisible(false);
  }
 }
 

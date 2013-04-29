@@ -10,6 +10,7 @@
 #include "background.h"
 #include "bullet.h"
 #include "kamek.h"
+#include "bowser.h"
 #include "spike.h"
 #include "ground.h"
 #include "ui.h"
@@ -28,12 +29,16 @@ void MainWindow::animate(){
   //view->setFocus();
   QWidget::setFocus();
   bool gen = false;
-  if(zapu->getVX() == -2 && rCount == 0){
+  if(zapu->getVX() == -2 && zapu->getVY()==0 && zapu->getState()!=-2){
    //cout<<"VX: "<<zapu->getVX()<<endl;
+   cout<<"HERE?\n";
+   zapu->setState(-2);
+   zapu->setVisible(false);
    rCount = count;
    resetting = true;
+   reset();
   }
-  else if(zapu->getVX() == -2 && (rCount+400) == count){
+  else if(zapu->getState() == -2 && (rCount+400) == count){
    rCount = 0;
    cout<<"BEFORE RESET\n";
    reset();
@@ -43,7 +48,6 @@ void MainWindow::animate(){
   zapu->move(count); 
   }
   if(zapu->getVX() == 1 || resetting == true){
-  //cout<<"IN DISSS\n";
    for(unsigned int i = 0; i<bObjects.size(); i++){
     bObjects[i]->move(count);
     if(i == 0){
@@ -53,13 +57,14 @@ void MainWindow::animate(){
        }
        zapu->setGround(floor);
      }
-     int last = bObjects.size()-1;
-     //cout<<bObjects[last]->pos().x()<<endl;
-     if(i == last && (bObjects[last]->pos().x() - bObjects[last-1]->pos().x())>64){
+     int last = 0;
+     if(i == bObjects.size()-1){
+      last = bObjects.size()-1;
+     }
+     if(last!=0 && (bObjects[last]->pos().x() - bObjects[last-1]->pos().x())>64){
       bObjects[i-1]->setPixmap(*ground16);
      }
      else if(bObjects[i]->pos().x() == -64){
-      //cout<<i<<" "<<bObjects[i]->pos().x()<<endl;
       scene->removeItem(bObjects.at(i));
       bObjects.erase(bObjects.begin()+i);
       gen = true;
@@ -91,7 +96,6 @@ void MainWindow::animate(){
         nameTxt->setFont(font2);
         nameLayout->addRow(nameTxt);
         layout->addLayout(nameLayout, 161, 122, 1, 100);
-       
         setLayout(layout);
         }
         else{
@@ -99,6 +103,7 @@ void MainWindow::animate(){
         cout<<"STOPPING\n";
         resetting = false;
         zapu->setVX(0);
+        zapu->setVisible(true);
         zapu->setPixmap(*yoshi);
         zapu->setPos(10, floor-75);
         //zapu = new MainChar(yoshi, 10, floor-75); // Let’s pretend a default constructor
@@ -110,23 +115,33 @@ void MainWindow::animate(){
    if(gen == true){
     int shift = bObjects[bObjects.size()-1]->pos().x();
     Ground *g  = new Ground(ground1, shift+64, bObjects[bObjects.size()-1]->pos().y()); 
-    if(fObjects.size() == 0){
+    if(genCount == -1 && fObjects.size() == 0){
      g->setLimit(18);
     }
     else{
      g->setLimit(12);
      cout<<"DECREASED LIMIT\n";
     }
+    if(genCount != -1){
+     genCount++;
+    }
     bObjects.push_back(g);
     scene->addItem(bObjects.at(bObjects.size()-1));
    }//end ground items
  }
 if(resetting == false){
-  if(spiked == false && count!= 0 && count%4000==0){
+ if(genCount == 5){
+   int ground = bObjects[bObjects.size()-1]->pos().y();
+   Bowser *b  = new Bowser(bWalk, bObjects[bObjects.size()-1]->pos().x(), ground); 
+   fObjects.push_back(b);
+   scene->addItem(fObjects[fObjects.size()-1]);
+   genCount = -1;
+ }
+  if(spiked == false && genCount == -1 && count!= 0 && count%4000==0){
     cout<<"NEW ENEMY\n";
     srand(time(NULL));
-    int rn = rand()%2;
-   if(rn == 0){
+    int rn = rand()%3;
+    if(rn == 0){
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
     fObjects.push_back(b);
     scene->addItem(fObjects[fObjects.size()-1]);
@@ -136,6 +151,9 @@ if(resetting == false){
     fObjects.push_back(k);
     spiked = false;
     scene->addItem(fObjects[fObjects.size()-1]);
+    }
+    else if(rn == 2){
+    genCount = 0;
     }
   }
    for(unsigned int i = 0; i<fObjects.size(); i++){
@@ -147,22 +165,33 @@ if(resetting == false){
        fObjects.push_back(s);
        scene->addItem(fObjects[fObjects.size()-1]);
      }
+   if(fObjects[i]->isVisible() && zapu->isVisible()){
      if(zapu->collidesWithItem(fObjects[i])){
-        //cout<<"YOSHI HIT A BULLET\n";
-        //cout<<"VX: "<<fObjects[0]->vX<<endl;
-        //cout<<"Diff: "<<fObjects[0]->pos().x()-fObjects[1]->pos().x()<<endl;
        if(zapu->getVX() != -2 && (zapu->pos().x() > fObjects[i]->pos().x()) && (zapu->pos().y()-10) < fObjects[i]->pos().y()){
+        if(fObjects[i]->getState()!=3 && fObjects[i]->getState()!=4){ 
           zapu->collideUp(0);
           fObjects[i]->collideDown(0);
+          if(fObjects[i]->getState()==3){
+           fObjects[i-1]->collideDown(0);
+          }
+         }
+         else if(fObjects[i]->getState()!=4){
+          zapu->setVX(-2);
+          zapu->collideDown(0);
+          fObjects[i]->collideUp(0);
+          zapu->setState(1);
+         }
         }
-        else {
+        else if(fObjects[i]->getState()!=4){
          if(zapu->getState()==-1 && fObjects[i]->getState()==-1){
           bounceBack = true;
           zapu->collideUp(1);
           fObjects[i]->collideDown(1);
          }
          else{
+          zapu->setVX(-2);
           zapu->collideDown(0);
+          zapu->setState(1);
           fObjects[i]->collideUp(0);
           }
         }
@@ -173,24 +202,34 @@ if(resetting == false){
        if(fObjects[i]->collidesWithItem(fObjects[j])){
           spiked = false;
           bounceBack = false;
-          cout<<"CASE 1\n";
+          rCount = 0;
   	  scene->removeItem(fObjects.at(i));
-  	  cout<<"CASE 2\n";
    	  scene->removeItem(fObjects.at(j));
-   	  cout<<"CASE 3\n";
 	  fObjects.erase(fObjects.begin()+i);
-	  cout<<"CASE 4\n";
 	  fObjects.erase(fObjects.begin()+j-1);
-	  cout<<"CASE 5\n";
         }
        }}
       }
-     if(fObjects[i]->pos().x()<-100 || fObjects[i]->pos().y()>110){
-      cout<<"REMOVE BULLET\n";
+     else if(fObjects[i]->getState()==3){
+       for(unsigned int j = 1; j<zObjects.size(); j++){
+         if(fObjects[i]->collidesWithItem(zObjects[j])){
+           scene->removeItem(zObjects[j]);
+           zObjects.erase(zObjects.begin()+j);
+           fObjects[i]->collideDown(3);
+        }
+       }
+     }
+     else if(fObjects[i]->getState()==4 && zapu->collidesWithItem(fObjects[i])){
+         scene->removeItem(fObjects[i]);
+         fObjects.erase(fObjects.begin()+i);
+     }
+     if(fObjects[i]->pos().x()<-125 || fObjects[i]->pos().y()>110){
+      cout<<"REMOVE BULLET VX: "<<zapu->getVX()<<" VY: "<<zapu->getVY()<<" RC: "<<rCount<<"\n";
       scene->removeItem(fObjects[i]);
       fObjects.erase(fObjects.begin()+i);
      }
     }
+   }
    for(unsigned int i = 0; i<zObjects.size(); i++){
     zObjects[i]->move(count);
     if(zObjects[i]->pos().x()>500){
@@ -205,7 +244,7 @@ if(resetting == false){
     points++;
     updateScore();
    }
-}
+ }
   count++;
 }
 
@@ -242,13 +281,15 @@ if(resetting == false && timer->isActive()){
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
  // cout<<"HERE\n";
-if(menus[0]->isVisible() || menus[1]->isVisible()){
 if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
    if(event->pos().y()>= 160 && event->pos().y() <= 224){
     if(menus[1]->isVisible()){
       menus[1]->setVisible(false);
+      menus[0]->setVisible(false);
+      zapu->setVX(0);
+      timer->start();
      }
-     else {
+     else if(menus[0]->isVisible()){
      menus[0]->setVisible(false);
      menus[3]->setVisible(true);
      nameBox = new QLineEdit();
@@ -262,27 +303,35 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
      //scene->addItem(&nameBox);
      //timer->start();
    }
- }}
- if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
-   if(event->pos().y()>= 340 && event->pos().y() <= 404){
-   qApp->quit();
- }}
+  }
+  else if(event->pos().y()>= 250 && event->pos().y() <= 314){
+      if(menus[1]->isVisible() || menus[2]->isVisible()){
+      if(menus[2]->isVisible()){
+         delete nameTxt;
+         delete scoreTxt;
+        }
+       newGame();
+       menus[0]->setVisible(false);
+       menus[1]->setVisible(false);
+       menus[2]->setVisible(false);
+      }
+  }
+  else if(event->pos().y()>= 340 && event->pos().y() <= 404){
+   if(menus[0]->isVisible() || menus[1]->isVisible() || menus[2]->isVisible()){
+    qApp->quit();
+    }
+  }
 }
-else if(menus[2]->isVisible()){
- if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
-   if(event->pos().y()>= 340 && event->pos().y() <= 404){
-     qApp->quit();
- }}
-}
-else if(menus[3]->isVisible()){
+if(menus[3]->isVisible()){
+cout<<"HERE\n";
  if(event->pos().x() >= ((WINDOW_MAX_X/2)-68) && event->pos().x()<= (WINDOW_MAX_X/2)+214){
    if(event->pos().y()>= 265 && event->pos().y() <= 329){
-   //bool isString;
-   //QString nameTxt = nameBox->text();
+   cout<<"DOUBLE HERE\n";
    if(nameBox->text().isEmpty()){
     menus[4]->setVisible(true);
    }
    else{
+    cout<<"Triple HERE\n";
     name = nameBox->text();
     delete nameBox;
     menus[3]->setVisible(false);
@@ -305,6 +354,8 @@ else if(timer->isActive()){
 void MainWindow::reset(){
  resetting = true;
  spiked = false;
+ genCount = -1;
+ rCount = 0;
  bounceBack = false;
  while(!fObjects.empty()){
    scene->removeItem(fObjects.at(0));
@@ -378,6 +429,73 @@ QPixmap* MainWindow::scoreImage(int num){
   case 9: p = nine; break;
  }
   return p;
+}
+
+void MainWindow::newGame(){
+ while(!fObjects.empty()){
+   scene->removeItem(fObjects.at(0));
+   fObjects.erase(fObjects.begin());
+ }
+ while(!zObjects.empty()){
+   scene->removeItem(zObjects.at(0));
+   zObjects.erase(zObjects.begin());
+ }
+ while(!bObjects.empty()){
+   scene->removeItem(bObjects.at(0));
+   bObjects.erase(bObjects.begin());
+ }
+ while(!eggs.empty()){
+  scene->removeItem(eggs.at(0));
+  eggs.erase(eggs.begin());
+ }
+ while(!score.empty()){
+   scene->removeItem(score.at(0));
+   score.erase(score.begin());
+ }
+  count = 0;
+  points = 0;    
+  numLives = 3;
+  rCount = 0;
+  resetting = false;
+  spiked = false;
+  bounceBack = false;
+  genCount = -1;
+ QPixmap *ground = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
+  for(int i = 0; i<12; i++){
+   Ground *g  = new Ground(ground, (i-1)*64, 20); 
+   g->setLimit(12);
+   bObjects.push_back(g); 
+   scene->addItem(bObjects.at(i));  
+  }
+ if(zapu == NULL){
+  yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
+  zapu = new MainChar(yoshi, 10, bObjects.at(0)->pos().y()-75); // Let’s pretend a default constructor
+  scene->addItem(zapu);
+ }
+ else{
+  zapu->setPixmap(*yoshi);
+  zapu->setPos(zapu->pos().x(), bObjects.at(0)->pos().y()-75);
+ }
+  zapu->setVX(0);
+  zapu->setGround(bObjects.at(0)->pos().y()-50);
+  zapu->setVisible(true);
+ QPixmap *bwEgg;   
+ UI *uiItem, *num;    
+  for(int i = 0; i<3; i++){
+   bwEgg = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
+   uiItem = new UI(bwEgg, i*34+92, -397, true);
+   eggs.push_back(uiItem);
+   scene->addItem(uiItem);
+  }
+  for(int j = 0; j<5; j++){
+   num = new UI(zero, j*15+309, -394, false);
+   score.push_back(num);
+   scene->addItem(num);
+  }
+ score[0]->setVisible(true);
+if(!timer->isActive()){
+  timer->start();
+ }
 }
 
 /** MainWindow default constructor. A new scene is created a view is set to
@@ -465,13 +583,7 @@ MainWindow::MainWindow()  {
     cheatList->setMaximumHeight(153);
     layout->addWidget(cheatList, 8, 10, 1, 1);
     */
-    count = 0;
-    points = 0;
-    numLives = 3;
-    rCount = 0;
-    resetting = false;
-    spiked = false;
-    bounceBack = false;
+ 
  // updateCheat = false;
     
     timer = new QTimer(this);
@@ -501,11 +613,20 @@ MainWindow::MainWindow()  {
     bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
     witch = new QPixmap(qApp->applicationDirPath() + "/Pictures/Kamek1.png");
     spikeBall = new QPixmap(qApp->applicationDirPath() + "/Pictures/SpikeBall.png");
+    bWalk = new QPixmap(qApp->applicationDirPath() + "/Pictures/bWalk1.png");
     elec = new QPixmap(qApp->applicationDirPath() + "/Pictures/Bolt.png");
     QPalette palette;
     QPixmap world, status;
     world.load(qApp->applicationDirPath()+"/Pictures/fullView.png");
     
+    count = 0;
+    points = 0;
+    numLives = 3;
+    rCount = 0;
+    resetting = false;
+    spiked = false;
+    bounceBack = false;
+    genCount = -1;
    /* status.load(qApp->applicationDirPath()+"/Pictures/StatusBarPause.png");  
     statusBar->setFixedSize(WINDOW_MAX_X, 61);
     palette.setBrush(statusBar->backgroundRole(), status);
