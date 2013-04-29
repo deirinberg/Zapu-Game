@@ -2,6 +2,9 @@
 #define MAINCHAR_H
 #include "foreground.h"
 #include <cmath>
+#include <QApplication>
+#include <iostream>
+using namespace std;
 
 class MainChar: public Foreground {
  public:
@@ -9,6 +12,7 @@ class MainChar: public Foreground {
  void move(int count); 
  void keySignal(QKeyEvent *e);
  void keyRelease(QKeyEvent *r);
+ void setVX(int vx);
  void setGround(int y);
  void collideUp(int num);
  void collideDown(int num);
@@ -68,6 +72,7 @@ MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  stopWalking = false;
  lost = false;
  pause = false;
+ state = 0;
  yw1 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
  yw2 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW2.png");
  yw3 = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW3.png");
@@ -93,7 +98,8 @@ MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 void MainChar::move(int count) {
 if(lost == false){
  if(count%60 == 0){
-  if(walking == true){
+  if(walking == true && vX > 0){
+   state = 0;
    egg = false;
    jumping = false;
    dj = false;
@@ -205,6 +211,7 @@ void MainChar::keyRelease(QKeyEvent *e){
    case Qt::Key_Down:
       cout<<"RELEASE DOWN KEY\n";
       if(egg == true){
+        state = 0;
         egg = false;
         walk();
         num = 0;
@@ -217,6 +224,23 @@ void MainChar::keyRelease(QKeyEvent *e){
      cout<<"SPACE KEY\n";
      break;
   }
+}
+
+void MainChar::setVX(int vx){
+ cout<<"WHAT "<<vx<<endl;
+ vX = vx;
+ if(vX != -2){
+  cout<<"INN HEERRE\n";
+  walking = false;
+  egg = false;
+  fall = false;
+  jumping = false;
+  doubleJump = false;
+  stopWalking = false;
+  lost = false;
+  pause = false;
+  state = 0;
+ }
 }
 
 void MainChar::setGround(int num){
@@ -234,6 +258,7 @@ void MainChar::setGround(int num){
  }
 }
 void MainChar::crouch(){
+ state = -1;
  setPixmap(*egg2);
 }
 
@@ -241,6 +266,7 @@ void MainChar::hurting(){
  setPixmap(*hurt);
  walking = false;
  vX = -2;
+ state = -2;
  egg = false;
 }
 

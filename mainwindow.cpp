@@ -4,10 +4,13 @@
 #include <QApplication>
 #include <QtAlgorithms>
 #include <QFile>
+#include <string>
 #include "mainchar.h"
 #include "bolt.h"
 #include "background.h"
 #include "bullet.h"
+#include "kamek.h"
+#include "spike.h"
 #include "ground.h"
 #include "ui.h"
 
@@ -25,20 +28,21 @@ void MainWindow::animate(){
   //view->setFocus();
   QWidget::setFocus();
   bool gen = false;
-
-  if(fObjects[0]->vX == -2 && rCount == 0){
+  if(zapu->getVX() == -2 && rCount == 0){
+   //cout<<"VX: "<<zapu->getVX()<<endl;
    rCount = count;
    resetting = true;
   }
-  else if(fObjects[0]->vX == -2 && (rCount+400) == count){
+  else if(zapu->getVX() == -2 && (rCount+400) == count){
    rCount = 0;
+   cout<<"BEFORE RESET\n";
    reset();
   } 
   
   if(resetting == false){
-  fObjects[0]->move(count); 
+  zapu->move(count); 
   }
-  if(fObjects[0]->vX == 1 || resetting == true){
+  if(zapu->getVX() == 1 || resetting == true){
   //cout<<"IN DISSS\n";
    for(unsigned int i = 0; i<bObjects.size(); i++){
     bObjects[i]->move(count);
@@ -47,7 +51,7 @@ void MainWindow::animate(){
       if(bObjects[i]->pos().x() <-24 && (bObjects[i+1]->pos().x()>82)){
         floor = 500;
        }
-       fObjects[0]->setGround(floor);
+       zapu->setGround(floor);
      }
      int last = bObjects.size()-1;
      //cout<<bObjects[last]->pos().x()<<endl;
@@ -61,21 +65,52 @@ void MainWindow::animate(){
       gen = true;
      }
      else if(bObjects[i]->pos().x() == 0 && resetting == true && timer->isActive()){
+        if(numLives==0){
+        timer->stop();
+        menus[2]->setVisible(true);
+        QFormLayout *scoreLayout = new QFormLayout();
+        scoreTxt = new QLabel("", this);
+        QString qscore = QString::number(points);
+        QFont font("Futura", 28, QFont::Bold, true);
+        QFont font2("Futura", 21, QFont::Bold, true);
+        font.setItalic(false);
+        font2.setItalic(false);
+        //nameBox->setFixedWidth(22);
+        scoreTxt->setText(qscore);
+        scoreTxt->setFixedHeight(44);
+        //scoreTxt->setFixedWidth(300);
+        scoreTxt->setFont(font);
+        scoreLayout->addRow(scoreTxt);
+        layout->addLayout(scoreLayout, 162, 228, 1, 100);
+        
+        QFormLayout *nameLayout = new QFormLayout();
+        nameTxt = new QLabel("", this);
+        nameTxt->setFixedHeight(32);
+        nameTxt->setText(name);
+        //cout<<"NAME: "<<name.toStdString()<<endl;
+        nameTxt->setFont(font2);
+        nameLayout->addRow(nameTxt);
+        layout->addLayout(nameLayout, 161, 122, 1, 100);
+       
+        setLayout(layout);
+        }
+        else{
         cout<<i<<" "<<bObjects[i]->pos().x()<<" "<<floor<<endl;
         cout<<"STOPPING\n";
-        QPixmap *yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
-        MainChar* m = new MainChar(yoshi, 10, floor-75); // Let’s pretend a default constructor
-        fObjects.push_back(m);
-        fObjects[0]->setGround(floor);
-        scene->addItem(fObjects[0]);
         resetting = false;
+        zapu->setVX(0);
+        zapu->setPixmap(*yoshi);
+        zapu->setPos(10, floor-75);
+        //zapu = new MainChar(yoshi, 10, floor-75); // Let’s pretend a default constructor
+        zapu->setGround(floor);
+        }
       }
    } //end for loop for ground items
     
    if(gen == true){
     int shift = bObjects[bObjects.size()-1]->pos().x();
     Ground *g  = new Ground(ground1, shift+64, bObjects[bObjects.size()-1]->pos().y()); 
-    if(fObjects.size() == 1){
+    if(fObjects.size() == 0){
      g->setLimit(18);
     }
     else{
@@ -87,26 +122,68 @@ void MainWindow::animate(){
    }//end ground items
  }
 if(resetting == false){
-  if(count!= 0 && count%4000==0){
+  if(spiked == false && count!= 0 && count%4000==0){
     cout<<"NEW ENEMY\n";
+    srand(time(NULL));
+    int rn = rand()%2;
+   if(rn == 0){
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
     fObjects.push_back(b);
     scene->addItem(fObjects[fObjects.size()-1]);
+    }
+    else if(rn == 1){
+    Kamek *k  = new Kamek(witch, bObjects[bObjects.size()-1]->pos().x(), 0); 
+    fObjects.push_back(k);
+    spiked = false;
+    scene->addItem(fObjects[fObjects.size()-1]);
+    }
   }
-   for(unsigned int i = 1; i<fObjects.size(); i++){
+   for(unsigned int i = 0; i<fObjects.size(); i++){
      fObjects[i]->move(count);
-     if(fObjects[0]->collidesWithItem(fObjects[1])){
+     if(spiked == false && fObjects[i]->getState() == 1){
+      cout<<"SPIKE BALL\n";
+       spiked = true;
+       Spike *s  = new Spike(spikeBall, 35, -236); 
+       fObjects.push_back(s);
+       scene->addItem(fObjects[fObjects.size()-1]);
+     }
+     if(zapu->collidesWithItem(fObjects[i])){
         //cout<<"YOSHI HIT A BULLET\n";
         //cout<<"VX: "<<fObjects[0]->vX<<endl;
         //cout<<"Diff: "<<fObjects[0]->pos().x()-fObjects[1]->pos().x()<<endl;
-       if(fObjects[0]->vX != -2 && (fObjects[0]->pos().x() > fObjects[1]->pos().x()) && (fObjects[0]->pos().y()-10) < fObjects[1]->pos().y()){
-          fObjects[0]->collideUp(0);
-          fObjects[1]->collideDown(0);
+       if(zapu->getVX() != -2 && (zapu->pos().x() > fObjects[i]->pos().x()) && (zapu->pos().y()-10) < fObjects[i]->pos().y()){
+          zapu->collideUp(0);
+          fObjects[i]->collideDown(0);
         }
         else {
-          fObjects[0]->collideDown(0);
-          fObjects[1]->collideUp(0);
+         if(zapu->getState()==-1 && fObjects[i]->getState()==-1){
+          bounceBack = true;
+          zapu->collideUp(1);
+          fObjects[i]->collideDown(1);
+         }
+         else{
+          zapu->collideDown(0);
+          fObjects[i]->collideUp(0);
+          }
         }
+      }
+     if(bounceBack == true){
+      for(unsigned int j = 1; j<fObjects.size(); j++){
+       if(fObjects[i]->getState()==1 && fObjects[j]->getState()==-1){
+       if(fObjects[i]->collidesWithItem(fObjects[j])){
+          spiked = false;
+          bounceBack = false;
+          cout<<"CASE 1\n";
+  	  scene->removeItem(fObjects.at(i));
+  	  cout<<"CASE 2\n";
+   	  scene->removeItem(fObjects.at(j));
+   	  cout<<"CASE 3\n";
+	  fObjects.erase(fObjects.begin()+i);
+	  cout<<"CASE 4\n";
+	  fObjects.erase(fObjects.begin()+j-1);
+	  cout<<"CASE 5\n";
+        }
+       }}
       }
      if(fObjects[i]->pos().x()<-100 || fObjects[i]->pos().y()>110){
       cout<<"REMOVE BULLET\n";
@@ -121,10 +198,10 @@ if(resetting == false){
      zObjects.erase(zObjects.begin()+i);
     }
    }
-  if(fObjects[0]->pos().y() > 35){
+  if(zapu->pos().y() > 35){
     reset();
    }
-  if(fObjects[0]->vX == 1 && count%100 == 0){
+  if(zapu->getVX() == 1 && count%100 == 0){
     points++;
     updateScore();
    }
@@ -138,45 +215,108 @@ void MainWindow::startGame(){
 
 
 void MainWindow::keyPressEvent(QKeyEvent *e){
- fObjects[0]->keySignal(e);
- if(!e->isAutoRepeat() && e->key() == Qt::Key_Space){
-   Bolt *b  = new Bolt(elec, 77, fObjects[0]->pos().y()+3);
-   zObjects.push_back(b);
-   scene->addItem(b);
+if(resetting == false && timer->isActive()){
+ if(zapu->getState()!=-2){
+  zapu->keySignal(e);
+  if(!e->isAutoRepeat() && e->key() == Qt::Key_Space){
+    Bolt *b  = new Bolt(elec, 77, zapu->pos().y()+3);
+    zObjects.push_back(b);
+    scene->addItem(b);
+  }
  }
+}
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *r){
- if(r->isAutoRepeat()){
-  r->ignore();
+if(resetting == false && timer->isActive()){
+ if(zapu->getState()!=-2){
+  if(r->isAutoRepeat()){
+   r->ignore();
+  }
+  else{
+   zapu->keyRelease(r);
+  }
  }
- else{
-  fObjects[0]->keyRelease(r);
- }
+}
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
-  cout<<"HERE\n";
+ // cout<<"HERE\n";
+if(menus[0]->isVisible() || menus[1]->isVisible()){
+if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
+   if(event->pos().y()>= 160 && event->pos().y() <= 224){
+    if(menus[1]->isVisible()){
+      menus[1]->setVisible(false);
+     }
+     else {
+     menus[0]->setVisible(false);
+     menus[3]->setVisible(true);
+     nameBox = new QLineEdit();
+     QFont font("Futura", 19, QFont::Bold, true);
+     font.setItalic(false);
+     //nameBox->setFixedWidth(22);
+     nameBox->setFixedHeight(44);
+     nameBox->setFont(font);
+     layout->addWidget(nameBox, 182, 168, 100, 250);
+     setLayout(layout);
+     //scene->addItem(&nameBox);
+     //timer->start();
+   }
+ }}
+ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
+   if(event->pos().y()>= 340 && event->pos().y() <= 404){
+   qApp->quit();
+ }}
+}
+else if(menus[2]->isVisible()){
+ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
+   if(event->pos().y()>= 340 && event->pos().y() <= 404){
+     qApp->quit();
+ }}
+}
+else if(menus[3]->isVisible()){
+ if(event->pos().x() >= ((WINDOW_MAX_X/2)-68) && event->pos().x()<= (WINDOW_MAX_X/2)+214){
+   if(event->pos().y()>= 265 && event->pos().y() <= 329){
+   //bool isString;
+   //QString nameTxt = nameBox->text();
+   if(nameBox->text().isEmpty()){
+    menus[4]->setVisible(true);
+   }
+   else{
+    name = nameBox->text();
+    delete nameBox;
+    menus[3]->setVisible(false);
+    menus[4]->setVisible(false);
+    timer->start();
+   }
+ }}
+}
+else if(timer->isActive()){
  if(event->pos().x() >= (WINDOW_MAX_X-66) && event->pos().x()<= WINDOW_MAX_X){
    if(event->pos().y()>= 0 && event->pos().y() <= 55){
     cout<<"PAUSE"<<endl;
-     if(timer->isActive()){
-       timer->stop();
-     }
-     else{
-      timer->start();
-     }
+    timer->stop();
+    menus[0]->setVisible(true);
+    menus[1]->setVisible(true);
   }}
+}
 }
 
 void MainWindow::reset(){
  resetting = true;
+ spiked = false;
+ bounceBack = false;
  while(!fObjects.empty()){
    scene->removeItem(fObjects.at(0));
    cout<<"BEFORE SIZE: "<<fObjects.size()<<endl;
    //delete fObjects.back();
    fObjects.erase(fObjects.begin());
    cout<<"AFTER SIZE: "<<fObjects.size()<<endl;
+ }
+ while(!zObjects.empty()){
+   scene->removeItem(zObjects.at(0));
+   //delete fObjects.back();
+   zObjects.erase(zObjects.begin());
  }
  numLives--;
  switch(numLives){
@@ -185,10 +325,6 @@ void MainWindow::reset(){
   case 2: eggs[2]->setVisible(false); break;
   case 3: eggs[3]->setVisible(false); break;
  }
- if(numLives!=0){
- 
-  }
- 
 }
 
 void MainWindow::updateScore(){
@@ -263,8 +399,9 @@ MainWindow::MainWindow()  {
     statusBar = new QGraphicsView();
     scene = new QGraphicsScene();
     view = new QGraphicsView(scene);
-    //layout = new QGridLayout(); 
+    layout = new QGridLayout(); 
     QFormLayout *viewLayout = new QFormLayout();
+    //viewLayout = new QFormLayout();
     
  /* QFormLayout *messageLayout = new QFormLayout();
     message = new QLabel("", this);
@@ -333,14 +470,15 @@ MainWindow::MainWindow()  {
     numLives = 3;
     rCount = 0;
     resetting = false;
+    spiked = false;
+    bounceBack = false;
  // updateCheat = false;
     
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
     timer->setInterval(3);
-    timer->start();
+    //timer->start();
     
-    cout<<"HERE?\n";
     zero = new QPixmap(qApp->applicationDirPath()+"/Pictures/0.png");
     one = new QPixmap(qApp->applicationDirPath()+"/Pictures/1.png");
     two = new QPixmap(qApp->applicationDirPath()+"/Pictures/2.png");
@@ -351,11 +489,18 @@ MainWindow::MainWindow()  {
     seven = new QPixmap(qApp->applicationDirPath()+"/Pictures/7.png");
     eight = new QPixmap(qApp->applicationDirPath()+"/Pictures/8.png");
     nine = new QPixmap(qApp->applicationDirPath()+"/Pictures/9.png");
-    cout<<"HERE??\n";    
+    
+    bMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/Menu1.png");
+    pMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/Menu2.png");
+    sMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/Menu3.png");
+    nMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/NameMenu.png");
+    error = new QPixmap(qApp->applicationDirPath()+"/Pictures/NameError.png");
         
     ground1 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground1.png");
     ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
     bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
+    witch = new QPixmap(qApp->applicationDirPath() + "/Pictures/Kamek1.png");
+    spikeBall = new QPixmap(qApp->applicationDirPath() + "/Pictures/SpikeBall.png");
     elec = new QPixmap(qApp->applicationDirPath() + "/Pictures/Bolt.png");
     QPalette palette;
     QPixmap world, status;
@@ -377,7 +522,7 @@ MainWindow::MainWindow()  {
     palette.setBrush(view->backgroundRole(), world);
     view->setPalette(palette);
     QWidget::setFocus();
-    //layout->addLayout(viewLayout, 1, 0, 9, 9);
+    layout->addLayout(viewLayout, 0, 0, 506, 466);
 
     //World *w  = new World(world, 0, -341); // Let’s pretend a default constructor
     //bObjects.push_back(w);
@@ -387,17 +532,26 @@ MainWindow::MainWindow()  {
     g->setLimit(12);
     bObjects.push_back(g);
     }
-    QPixmap *yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
-    MainChar* m = new MainChar(yoshi, 10, -55); // Let’s pretend a default constructor
-    fObjects.push_back(m);
+    yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
+    zapu = new MainChar(yoshi, 10, -55); // Let’s pretend a default constructor
+    scene->addItem(zapu);
     for (unsigned int i=0; i<bObjects.size(); i++ ) {
      scene->addItem(bObjects.at(i));
     }
-    scene->addItem(fObjects.at(0));
+    
+    UI *menu1 = new UI(bMenu, 0, -410, true);
+    menus.push_back(menu1);
+    UI *menu2 = new UI(pMenu, 0, -410, false);
+    menus.push_back(menu2);
+    UI *menu3 = new UI(sMenu, 0, -410, false);
+    menus.push_back(menu3);
+    UI *menu4 = new UI(nMenu, 0, -410, false);
+    menus.push_back(menu4);
+    UI *nError = new UI(error, 50, -275, false);
+    menus.push_back(nError);
     
     QPixmap *bwEgg;
-    UI *uiItem;
-    UI *num;
+    UI *uiItem, *num;
     for(int i = 0; i<3; i++){
      bwEgg = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
      uiItem = new UI(bwEgg, i*34+92, -397, true);
@@ -409,8 +563,13 @@ MainWindow::MainWindow()  {
      score.push_back(num);
      scene->addItem(num);
     }
+    for(unsigned int i = 0; i<menus.size(); i++){
+      menus[i]->setZValue(5);
+      scene->addItem(menus[i]);
+    }
+    
     score[0]->setVisible(true);
-    setLayout(viewLayout);
+    setLayout(layout);
     
 }
 

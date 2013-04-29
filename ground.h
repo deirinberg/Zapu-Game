@@ -7,12 +7,9 @@ class Ground: public Background {
  public:
  Ground (QPixmap *pm, int nx, int ny);
  void move(int count); // Implement the move method
- void setGround(int y);
  void setInitial();
  void setLimit(int num);
  void newImage(int max);
- void keySignal(QKeyEvent *e);
- void keyRelease(QKeyEvent *r);
  void getVx();
  int limit;
  bool continuous;
@@ -85,16 +82,5 @@ void Ground::newImage(int max){
  setPixmap(*p);
 }
 
-void Ground::setGround(int y){
-
-}
-
-void Ground::keySignal(QKeyEvent *e){
-  e->ignore();
-}
-
-void Ground::keyRelease(QKeyEvent *r){
-  r->ignore();
-}
 
 #endif // BACKGROUND_H

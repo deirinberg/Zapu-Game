@@ -27,6 +27,7 @@
 #include "background.h"
 
 class UI;
+class MainChar;
 
 #define WINDOW_MAX_X 506
 #define WINDOW_MAX_Y 466
@@ -59,9 +60,12 @@ public:
     void show();
     /** Clears the cheat in the text box if it exists */
     bool resetting;
+    bool spiked;
+    bool bounceBack;
     void clearCheat();
     void reset();
     void updateScore();
+    QString name;
     QPixmap* scoreImage(int num);
 private:
     /** Where all tiles are added to */
@@ -70,7 +74,7 @@ private:
     QGraphicsView *view;
     QGraphicsView *statusBar;
     /** Positions all of the buttons/text/text boxes in the window */
-    QGridLayout *layout;
+    //QGridLayout *layout;
     /** Textbox for user to enter the size of the board */
     QLineEdit *sizeEdit;
     /** Textbox for user to enter the number of initial moves of the board */
@@ -96,9 +100,17 @@ private:
     /** Displays errors or messages to user */
     QLabel *message;
     
+    QLineEdit *nameBox;
+    QLabel *scoreTxt;
+    QLabel *nameTxt;
+    QGridLayout *layout;
+    
+    QPixmap *yoshi;
     QPixmap *ground1;
     QPixmap *ground16;
     QPixmap *bulletBill;
+    QPixmap *witch;
+    QPixmap *spikeBall;
     QPixmap *elec;
     QPixmap *zero;
     QPixmap *one;
@@ -111,10 +123,18 @@ private:
     QPixmap *eight;
     QPixmap *nine;
     
+    QPixmap *bMenu;
+    QPixmap *pMenu;
+    QPixmap *sMenu;
+    QPixmap *nMenu;
+    QPixmap *error;
+    
+    MainChar *zapu;
     
     vector<Foreground*> fObjects;
     vector<Foreground*> zObjects;
     vector<Background*> bObjects;
+    vector<UI*>menus;
     vector<UI*>eggs;
     vector<UI*>score;
     

@@ -1,10 +1,10 @@
-#ifndef BULLET_H
-#define BULLET_H
+#ifndef KAMEK_H
+#define KAMEK_H
 #include "foreground.h"
 
-class Bullet: public Foreground {
+class Kamek: public Foreground {
  public:
- Bullet (QPixmap *pm, int nx, int ny);
+ Kamek (QPixmap *pm, int nx, int ny);
  void move(int count); // Implement the move method
  void sink();
  void setGround(int y);
@@ -12,47 +12,50 @@ class Bullet: public Foreground {
  void keyRelease(QKeyEvent *r);
  void collideUp(int num);
  void collideDown(int num);
- bool sinking;
+ bool spike;
 };
 
-Bullet::Bullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
+Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
- int py = rand()%3+1;
+ int py = rand()%2;
  switch(py){
- case 1: py = -200; break;
- case 2: py = -100; break;
- case 3: py = -70; break;
+ case 0: py = -300; break;
+ case 1: py = -280; break;
  }
+ state = 0;
+ spike = false;
  cout<<"PY: "<<py<<endl;
  setPos(768, py);
  setZValue(2);
- sinking = false;
 //Any specific initialization code for BigThing goes here.
 }
-void Bullet::move(int count) {
+void Kamek::move(int count) {
 if(count%2 == 0){
- if(sinking == false){
+ if(pos().x() > 16){
   moveBy(-1, 0);
  }
- else{
-  moveBy(0, 1);
+ else if(spike == false){
+  state = 1;
+  spike = true;
+  setPixmap(qApp->applicationDirPath()+"/Pictures/Kamek2.png");
  }
 }
 //Implement the movement behavior of BigThing here. This is required.
 }
 
-void Bullet::collideUp(int num){
+void Kamek::collideUp(int num){
  //yoshi case
  if(num == 0){
  
  }
 }
 
-void Bullet::collideDown(int num){
+void Kamek::collideDown(int num){
 //yoshi case
  if(num == 0){
-   sinking = true;
+  
  }
 }
 
-#endif // BULLET_H
+#endif // KAMEK_H
+
