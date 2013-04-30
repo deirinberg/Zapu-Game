@@ -100,7 +100,7 @@ MainChar::MainChar(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 }
 void MainChar::move(int count) {
 if(lost == false){
- if(count%50 == 0){
+ if(count%25 == 0){
   if(walking == true && vX > 0){
    state = 0;
    vY = 0;
@@ -116,7 +116,7 @@ if(lost == false){
   }
  }
 }
- if(count%4 == 0){
+ if(count%2 == 0){
   if(jumping == true){
    jump(50);
   }

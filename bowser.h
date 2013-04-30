@@ -22,19 +22,19 @@ Bowser::Bowser(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 void Bowser::move(int count) {
 if(count%3 == 0){
  if(shocked == false/*&& pos().x()>30*/){
-  moveBy(-1, 0);
+  moveBy(-2, 0);
  }
  else if(shocked == true){
   shocked = false;
  }
 }
-if(count%100 == 0 && health != 0){
+if(count%50 == 0 && health != 0){
  walk(count);
 }
 }
 
 void Bowser::walk(int count){
- if(count%200 == 0){
+ if(count%100 == 0){
   setPixmap(qApp->applicationDirPath()+"/Pictures/bWalk1.png");
  }
  else{

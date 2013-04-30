@@ -20,7 +20,7 @@ Ground::Ground( QPixmap *pm, int nx, int ny ) : Background( pm, nx, ny ) {
 }
 void Ground::move(int count) {
  if(count%3 == 0){
- moveBy(-1, 0);
+ moveBy(-2, 0);
  }
 }
 
@@ -50,8 +50,14 @@ void Ground::newImage(int max){
   case 12: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground14.png"); break;
   default: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground15.png"); 
     int shiftX = 128;
-    if(pic%3 != 0){
+    if(pic%3 == 0){
      shiftX = 96;
+    }
+    else if(pic%3 ==1){
+     shiftX = 128;
+    }
+    else {
+     shiftX = 192;
     }
     if(pos().y() == 20){
      if(pic%2 == 1){

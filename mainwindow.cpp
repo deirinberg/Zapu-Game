@@ -9,6 +9,7 @@
 #include "bolt.h"
 #include "background.h"
 #include "bullet.h"
+#include "extraEgg.h"
 #include "kamek.h"
 #include "bowser.h"
 #include "spike.h"
@@ -31,7 +32,6 @@ void MainWindow::animate(){
   bool gen = false;
   if(zapu->getVX() == -2 && zapu->getVY()==0 && zapu->getState()!=-2){
    //cout<<"VX: "<<zapu->getVX()<<endl;
-   cout<<"HERE?\n";
    zapu->setState(-2);
    zapu->setVisible(false);
    rCount = count;
@@ -45,7 +45,7 @@ void MainWindow::animate(){
   } 
   
   if(resetting == false){
-  zapu->move(count); 
+   zapu->move(count); 
   }
   if(zapu->getVX() == 1 || resetting == true){
    for(unsigned int i = 0; i<bObjects.size(); i++){
@@ -116,7 +116,7 @@ void MainWindow::animate(){
     int shift = bObjects[bObjects.size()-1]->pos().x();
     Ground *g  = new Ground(ground1, shift+64, bObjects[bObjects.size()-1]->pos().y()); 
     if(genCount == -1 && fObjects.size() == 0){
-     g->setLimit(18);
+      g->setLimit(18);
     }
     else{
      g->setLimit(12);
@@ -137,10 +137,11 @@ if(resetting == false){
    scene->addItem(fObjects[fObjects.size()-1]);
    genCount = -1;
  }
-  if(spiked == false && genCount == -1 && count!= 0 && count%4000==0){
+  int div = 2000*freq;
+  if(spiked == false && genCount == -1 && count!= 0 && count%div==0){
     cout<<"NEW ENEMY\n";
     srand(time(NULL));
-    int rn = rand()%3;
+    int rn = rand()%4;
     if(rn == 0){
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
     fObjects.push_back(b);
@@ -155,6 +156,14 @@ if(resetting == false){
     else if(rn == 2){
     genCount = 0;
     }
+    else if(rn == 3){
+    if(numLives <= 3 && points>=150){
+    int ground = bObjects[bObjects.size()-1]->pos().y();
+    ExtraEgg *e  = new ExtraEgg(eEgg, bObjects[bObjects.size()-1]->pos().x(), ground-18); 
+    fObjects.push_back(e);
+    scene->addItem(fObjects[fObjects.size()-1]);
+    }
+   }
   }
    for(unsigned int i = 0; i<fObjects.size(); i++){
      fObjects[i]->move(count);
@@ -168,7 +177,7 @@ if(resetting == false){
    if(fObjects[i]->isVisible() && zapu->isVisible()){
      if(zapu->collidesWithItem(fObjects[i])){
        if(zapu->getVX() != -2 && (zapu->pos().x() > fObjects[i]->pos().x()) && (zapu->pos().y()-10) < fObjects[i]->pos().y()){
-        if(fObjects[i]->getState()!=3 && fObjects[i]->getState()!=4){ 
+        if(fObjects[i]->getState()!=3 && fObjects[i]->getState()!=4 && fObjects[i]->getState()!=7){ 
           zapu->collideUp(0);
           fObjects[i]->collideDown(0);
           if(fObjects[i]->getState()==3){
@@ -181,12 +190,30 @@ if(resetting == false){
           fObjects[i]->collideUp(0);
           zapu->setState(1);
          }
+         else if(fObjects[i]->getState()==7){
+           cout<<"CASE A\n";
+           scene->removeItem(fObjects.at(i));
+           cout<<"CASE B\n";
+	   fObjects.erase(fObjects.begin()+i);
+	   cout<<"CASE C\n";
+           addEgg();
+           cout<<"CASE D\n";
+         }
         }
         else if(fObjects[i]->getState()!=4){
          if(zapu->getState()==-1 && fObjects[i]->getState()==-1){
           bounceBack = true;
           zapu->collideUp(1);
           fObjects[i]->collideDown(1);
+         }
+         else if(fObjects[i]->getState()==7){
+          cout<<"CASE E\n";
+          scene->removeItem(fObjects.at(i));
+          cout<<"CASE F\n";
+	  fObjects.erase(fObjects.begin()+i);
+	  cout<<"CASE G\n";
+          addEgg();
+          cout<<"CASE H\n";
          }
          else{
           zapu->setVX(-2);
@@ -240,7 +267,7 @@ if(resetting == false){
   if(zapu->pos().y() > 35){
     reset();
    }
-  if(zapu->getVX() == 1 && count%100 == 0){
+  if(zapu->getVX() == 1 && count%50 == 0){
     points++;
     updateScore();
    }
@@ -250,6 +277,15 @@ if(resetting == false){
 
 void MainWindow::startGame(){
 
+}
+
+void MainWindow::addEgg(){
+  numLives++;
+  switch(numLives){
+  case 2: eggs[1]->setVisible(true); break;
+  case 3: eggs[2]->setVisible(true); break;
+  case 4: eggs[3]->setVisible(true); break;
+ }
 }
 
 
@@ -281,6 +317,10 @@ if(resetting == false && timer->isActive()){
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
  // cout<<"HERE\n";
+ if(menus[5]->isVisible()){
+  menus[0]->setVisible(true);
+  menus[5]->setVisible(false);
+ }
 if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
    if(event->pos().y()>= 160 && event->pos().y() <= 224){
     if(menus[1]->isVisible()){
@@ -315,6 +355,10 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
        menus[1]->setVisible(false);
        menus[2]->setVisible(false);
       }
+     else if(menus[0]->isVisible()){
+      menus[0]->setVisible(false);
+      menus[5]->setVisible(true);
+     }
   }
   else if(event->pos().y()>= 340 && event->pos().y() <= 404){
    if(menus[0]->isVisible() || menus[1]->isVisible() || menus[2]->isVisible()){
@@ -359,20 +403,17 @@ void MainWindow::reset(){
  bounceBack = false;
  while(!fObjects.empty()){
    scene->removeItem(fObjects.at(0));
-   cout<<"BEFORE SIZE: "<<fObjects.size()<<endl;
    //delete fObjects.back();
    fObjects.erase(fObjects.begin());
-   cout<<"AFTER SIZE: "<<fObjects.size()<<endl;
  }
  while(!zObjects.empty()){
    scene->removeItem(zObjects.at(0));
-   //delete fObjects.back();
    zObjects.erase(zObjects.begin());
  }
  numLives--;
  switch(numLives){
   case 0: eggs[0]->setVisible(false); /* reset */
-  case 1: eggs[1]->setVisible(false);
+  case 1: eggs[1]->setVisible(false); break;
   case 2: eggs[2]->setVisible(false); break;
   case 3: eggs[3]->setVisible(false); break;
  }
@@ -380,6 +421,23 @@ void MainWindow::reset(){
 
 void MainWindow::updateScore(){
    int thous, hunds, tens, ones;
+   if(points > 100){
+    timer->setInterval(5);
+    freq = 0.40;
+   }
+   else if(points >250){
+    freq = 0.25;
+   }
+   else if(points > 500){
+   timer->setInterval(4);
+   freq = 0.05;
+   }
+   else if(points > 750){
+    freq = 0.02;
+   }
+   else if(points > 1000){
+    freq = 0.01;
+   }
  if(points < 10){
    score[0]->setPixmap(*scoreImage(points));
  }
@@ -456,6 +514,7 @@ void MainWindow::newGame(){
   points = 0;    
   numLives = 3;
   rCount = 0;
+  freq = 1;
   resetting = false;
   spiked = false;
   bounceBack = false;
@@ -481,12 +540,13 @@ void MainWindow::newGame(){
   zapu->setVisible(true);
  QPixmap *bwEgg;   
  UI *uiItem, *num;    
-  for(int i = 0; i<3; i++){
+  for(int i = 0; i<4; i++){
    bwEgg = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
-   uiItem = new UI(bwEgg, i*34+92, -397, true);
+   uiItem = new UI(bwEgg, i*34+90, -397, true);
    eggs.push_back(uiItem);
    scene->addItem(uiItem);
   }
+  eggs[3]->setVisible(false);
   for(int j = 0; j<5; j++){
    num = new UI(zero, j*15+309, -394, false);
    score.push_back(num);
@@ -588,7 +648,7 @@ MainWindow::MainWindow()  {
     
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
-    timer->setInterval(3);
+    timer->setInterval(6);
     //timer->start();
     
     zero = new QPixmap(qApp->applicationDirPath()+"/Pictures/0.png");
@@ -607,9 +667,11 @@ MainWindow::MainWindow()  {
     sMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/Menu3.png");
     nMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/NameMenu.png");
     error = new QPixmap(qApp->applicationDirPath()+"/Pictures/NameError.png");
+    help = new QPixmap(qApp->applicationDirPath()+"/Pictures/Help.png");
         
     ground1 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground1.png");
     ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
+    eEgg = new QPixmap(qApp->applicationDirPath() + "/Pictures/extraEgg.png");
     bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
     witch = new QPixmap(qApp->applicationDirPath() + "/Pictures/Kamek1.png");
     spikeBall = new QPixmap(qApp->applicationDirPath() + "/Pictures/SpikeBall.png");
@@ -623,6 +685,7 @@ MainWindow::MainWindow()  {
     points = 0;
     numLives = 3;
     rCount = 0;
+    freq = 1;
     resetting = false;
     spiked = false;
     bounceBack = false;
@@ -670,15 +733,18 @@ MainWindow::MainWindow()  {
     menus.push_back(menu4);
     UI *nError = new UI(error, 50, -275, false);
     menus.push_back(nError);
+    UI *hMenu = new UI(help, 0, -410, false);
+    menus.push_back(hMenu);
     
     QPixmap *bwEgg;
     UI *uiItem, *num;
-    for(int i = 0; i<3; i++){
+    for(int i = 0; i<4; i++){
      bwEgg = new QPixmap(qApp->applicationDirPath()+"/Pictures/bwEgg.png");
-     uiItem = new UI(bwEgg, i*34+92, -397, true);
+     uiItem = new UI(bwEgg, i*34+90, -397, true);
      eggs.push_back(uiItem);
      scene->addItem(uiItem);
     }
+    eggs[3]->setVisible(false);
     for(int j = 0; j<5; j++){
      num = new UI(zero, j*15+309, -394, false);
      score.push_back(num);

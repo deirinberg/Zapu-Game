@@ -17,6 +17,8 @@ class Kamek: public Foreground {
 
 Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
+ int ax = rand()%10;
+ srand(ax);
  int py = rand()%2;
  switch(py){
  case 0: py = -350; break;
@@ -32,7 +34,7 @@ Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 void Kamek::move(int count) {
 if(count%2 == 0){
  if(pos().x() > 16){
-  moveBy(-1, 0);
+  moveBy(-2, 0);
  }
  else if(spike == false){
   state = 1;

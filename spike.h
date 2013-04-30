@@ -22,7 +22,7 @@ Spike::Spike( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  setZValue(4);
 }
 void Spike::move(int count) {
-if(count%4 == 0){
+if(count%2 == 0){
  if(bounce == false){
    fall(0);
   }

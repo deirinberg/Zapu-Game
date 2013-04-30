@@ -36,10 +36,10 @@ Bullet::Bullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 void Bullet::move(int count) {
 if(count%2 == 0){
  if(sinking == false){
-  moveBy(-1, 0);
+  moveBy(-2, 0);
  }
  else{
-  moveBy(0, 1);
+  moveBy(0, 2);
  }
 }
 //Implement the movement behavior of BigThing here. This is required.

@@ -55,6 +55,7 @@ public:
     int numLives;
     int rCount;
     int genCount;
+    double freq;
     /** True or false based on if cheat can be cleared or not */
     bool updateCheat;
     /** Shows all items which are added to the QWidget */
@@ -67,6 +68,7 @@ public:
     void clearCheat();
     void reset();
     void updateScore();
+    void addEgg();
     QString name;
     QPixmap* scoreImage(int num);
 private:
@@ -107,9 +109,11 @@ private:
     QLabel *nameTxt;
     QGridLayout *layout;
     
+    QPixmap *backcolor;
     QPixmap *yoshi;
     QPixmap *ground1;
     QPixmap *ground16;
+    QPixmap *eEgg;
     QPixmap *bulletBill;
     QPixmap *witch;
     QPixmap *bWalk;
@@ -131,6 +135,7 @@ private:
     QPixmap *sMenu;
     QPixmap *nMenu;
     QPixmap *error;
+    QPixmap *help;
     
     MainChar *zapu;
     

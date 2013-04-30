@@ -17,9 +17,8 @@ Bolt::Bolt( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
 void Bolt::move(int count) {
 //cout<<"BULLET POS: "<<pos().x()<<endl;
 if(count%2 == 0){
- moveBy(1, 0);
+ moveBy(2, 0);
 }
-//Implement the movement behavior of BigThing here. This is required.
 }
 
 void Bolt::collideUp(int num){
