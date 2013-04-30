@@ -118,7 +118,7 @@ void MainWindow::animate(){
    if(gen == true){
     int shift = bObjects[bObjects.size()-1]->pos().x();
     Ground *g  = new Ground(ground1, shift+64, bObjects[bObjects.size()-1]->pos().y()); 
-    if(genCount == -1 && fObjects.size() == 0){
+    if((genCount == -1 && fObjects.size() == 0) || moreGaps == true){
       g->setLimit(18);
     }
     else{
@@ -143,6 +143,7 @@ if(resetting == false){
   if(spiked == false && genCount == -1 && count!= 0 && count%div==0){
     srand(time(NULL));
     int rn = rand()%4;
+    moreGaps = false;
     if(rn == 0){
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
     fObjects.push_back(b);
@@ -158,11 +159,14 @@ if(resetting == false){
     genCount = 0;
     }
     else if(rn == 3){
-    if(numLives <= 3 && points>=150){
+    if(numLives <= 3 && points>=150 && count%3==0){
     int ground = bObjects[bObjects.size()-1]->pos().y();
     ExtraEgg *e  = new ExtraEgg(eEgg, bObjects[bObjects.size()-1]->pos().x(), ground-18); 
     fObjects.push_back(e);
     scene->addItem(fObjects[fObjects.size()-1]);
+    }
+    else{
+     moreGaps = true;
     }
    }
   }
@@ -293,7 +297,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e){
 if(resetting == false && timer->isActive()){
  if(zapu->getState()!=-2){
   zapu->keySignal(e);
-  if(!e->isAutoRepeat() && e->key() == Qt::Key_Space){
+  if(!e->isAutoRepeat() && e->key() == Qt::Key_Space && zapu->getState()!=-1){
     Bolt *b  = new Bolt(elec, 77, zapu->pos().y()+3);
     zObjects.push_back(b);
     scene->addItem(b);
@@ -448,17 +452,17 @@ void MainWindow::updateScore(){
     freq = 0.40;
    }
    else if(points >250){
-    freq = 0.25;
+    freq = 0.10;
    }
    else if(points > 500){
    timer->setInterval(4);
-   freq = 0.05;
+   freq = 0.02;
    }
    else if(points > 750){
-    freq = 0.02;
+    freq = 0.01;
    }
    else if(points > 1000){
-    freq = 0.01;
+    freq = 0.005;
    }
  if(points < 10){
    score[0]->setPixmap(*scoreImage(points));
@@ -550,6 +554,7 @@ void MainWindow::newGame(){
   resetting = false;
   spiked = false;
   bounceBack = false;
+  moreGaps = false;
   genCount = -1;
  QPixmap *ground = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
   for(int i = 0; i<12; i++){
@@ -646,6 +651,7 @@ MainWindow::MainWindow()  {
     resetting = false;
     spiked = false;
     bounceBack = false;
+    moreGaps = false;
     genCount = -1;
   
     scene->setSceneRect(0, -WINDOW_MAX_Y+50, WINDOW_MAX_X-4, WINDOW_MAX_Y-4);

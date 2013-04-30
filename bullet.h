@@ -28,7 +28,6 @@ class Bullet: public Foreground {
 Bullet::Bullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
  int py = rand()%9;
- cout<<"PY: "<<py<<"\n";
  if(py<=2){
  py = -100;
  }

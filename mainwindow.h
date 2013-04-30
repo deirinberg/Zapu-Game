@@ -64,6 +64,8 @@ public:
     bool spiked;
     /** Returns if the spikeBall should bounce up or not */
     bool bounceBack;
+    /** Returns if there are more jumps or not */
+    bool moreGaps;
     /** Resets main character if a life is lost */
     void reset();
     /** Updates the score of the game */

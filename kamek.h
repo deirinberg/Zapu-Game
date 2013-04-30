@@ -35,7 +35,6 @@ Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  }
  state = 0;
  spike = false;
- cout<<"PY: "<<py<<endl;
  setPos(768, py);
  setZValue(2);
 }
