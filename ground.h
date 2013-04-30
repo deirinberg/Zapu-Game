@@ -5,34 +5,58 @@
 
 class Ground: public Background {
  public:
+ /** Default constructor for foreground object */
  Ground (QPixmap *pm, int nx, int ny);
- void move(int count); // Implement the move method
- void setInitial();
+ /** Animates ground items */
+ void move(int count); 
+ /** Sets the amount of gaps in the ground */
  void setLimit(int num);
+ /** Generates a new random image based on the limit */
  void newImage(int max);
- void getVx();
- int limit;
- bool continuous;
 };
 
+/** Default constructor, inherits from background class but no new
+ *  implementation necessary
+ *
+ *  @param pointer to QPixmap
+ *  @param x position
+ *  @param y position 
+ *  @return nothing
+ */
 Ground::Ground( QPixmap *pm, int nx, int ny ) : Background( pm, nx, ny ) {
 
 }
+/** Moves ground objects over by two pixels after time has elapsed
+ *
+ *  @param count of how much time has elapsed since start of game
+ *  @return nothing
+ */
 void Ground::move(int count) {
  if(count%3 == 0){
  moveBy(-2, 0);
  }
 }
-
+/** Calls newImage to be generated 
+ *
+ *  @param the amount of possible background images
+ *  @return nothing
+ */
 void Ground::setLimit(int num){
   newImage(num);
 }
 
+/** Generates a random number based on the possible background images. 
+ *  Cases 1-12 are normal while any others have gaps. The distance of the
+ *  gaps are also based on the random number and so is the y coordinate
+ *  floor level. setPos and setPixmap are called in the function
+ *
+ *  @param the amount of possible background images
+ *  @return nothing
+ */
 void Ground::newImage(int max){
  QPixmap *p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
  srand(time(NULL));
  int pic = rand()%max;
- cout<<pic<<endl;
 
   switch(pic){
   case 0: p = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground2.png"); break;

@@ -4,17 +4,26 @@
 
 class Kamek: public Foreground {
  public:
+ /** Default constructor for witch */
  Kamek (QPixmap *pm, int nx, int ny);
- void move(int count); // Implement the move method
- void sink();
- void setGround(int y);
- void keySignal(QKeyEvent *e);
- void keyRelease(QKeyEvent *r);
+ /** Animates witch */
+ void move(int count); 
+ /** Makes witch disappear when it hits other objects */
  void collideUp(int num);
+ /** Makes witch disappear when it hits other objects */
  void collideDown(int num);
+ /** Returns if witch is coasting or ready to throw a spike */
  bool spike;
 };
 
+/** Default constructor- kamek's y pos is randomly generated and set.
+ *  It's z value is set to 2 and spike is set to false.
+ *
+ *  @param pointer to QPixmap
+ *  @param x position
+ *  @param y position 
+ *  @return nothing
+ */
 Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
  int ax = rand()%10;
@@ -29,8 +38,15 @@ Kamek::Kamek( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  cout<<"PY: "<<py<<endl;
  setPos(768, py);
  setZValue(2);
-//Any specific initialization code for BigThing goes here.
 }
+
+/** Moves witch back 2 pixels when a duration has elapsed and
+ *  it isn't ready to throw a spike. If it is the image is
+ *  change to be doing that and it's state is changed.
+ *
+ * @param count of how much time has elapsed since start of game
+ * @return nothing
+ */
 void Kamek::move(int count) {
 if(count%2 == 0){
  if(pos().x() > 16){
@@ -42,18 +58,27 @@ if(count%2 == 0){
   setPixmap(qApp->applicationDirPath()+"/Pictures/Kamek2.png");
  }
 }
-//Implement the movement behavior of BigThing here. This is required.
 }
 
+/** If object collides with witch and witch is above object this function is called
+ *  If the case isn't special the witch will disappear.
+ *
+ *  @param num that gives case of collision
+ *  @return nothing
+ */
 void Kamek::collideUp(int num){
- //yoshi case
  if(num == 0){
   setVisible(false);
  }
 }
 
+/** If object collides with witch and witch is below object this function is called
+ *  If the case isn't special the witch will disappear.
+ *
+ *  @param num that gives case of collision
+ *  @return nothing
+ */
 void Kamek::collideDown(int num){
-//yoshi case
  if(num == 0){
   setVisible(false);
  }

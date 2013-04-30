@@ -26,7 +26,9 @@
 #include "foreground.h"
 #include "background.h"
 
+/** Forward declaration to avoid importing the same thing */
 class UI;
+/** Forward declaration to avoid importing the same thing */
 class MainChar;
 
 #define WINDOW_MAX_X 506
@@ -40,127 +42,131 @@ public:
     explicit MainWindow();
     /** MainWindow destructor */
     ~MainWindow();
-    /** Counter for animating tiles */
+    /** Count of how much time has elapsed */
     int count;
-    /** Location of the tile to animate */
-    int index;
-    /** Location of blank tile */
-    int blankLoc;
-    /** X distance tile needs to move during animation */
-    int dx;
-    /** Y distance tile needs to move during animation */
-    int dy;
+    /** Y position of current ground */
     int floor;
+    /** Score of game */
     int points;
+    /** Number of lives left */
     int numLives;
-    int rCount;
+    /** Number of floors without gaps generated */
     int genCount;
+    /** Frequency of enemies */
     double freq;
-    /** True or false based on if cheat can be cleared or not */
-    bool updateCheat;
     /** Shows all items which are added to the QWidget */
     void show();
-    /** Clears the cheat in the text box if it exists */
+    /** Starts a new game when selected */
     void newGame();
+    /** Indicates during animation if player just lost or not */
     bool resetting;
+    /** Whether spike ball has been dropped or not */
     bool spiked;
+    /** Returns if the spikeBall should bounce up or not */
     bool bounceBack;
-    void clearCheat();
+    /** Resets main character if a life is lost */
     void reset();
+    /** Updates the score of the game */
     void updateScore();
+    /** Adds an egg (life) to the status bar */
     void addEgg();
+    /** Holds the name of the user */
     QString name;
+    /** Returns the numerical image used for generating the score */
     QPixmap* scoreImage(int num);
 private:
-    /** Where all tiles are added to */
+    /** Where all objects are added to */
     QGraphicsScene *scene;
-    /** Holds/displays the scene which contains the tiles */
+    /** Holds/displays the scene which contains the objects */
     QGraphicsView *view;
-    QGraphicsView *statusBar;
-    /** Positions all of the buttons/text/text boxes in the window */
-    //QGridLayout *layout;
-    /** Textbox for user to enter the size of the board */
-    QLineEdit *sizeEdit;
-    /** Textbox for user to enter the number of initial moves of the board */
-    QLineEdit *startMovesEdit;
-    /** Textbox for user to enter the random seed number for the initial moves of the board */
-    QLineEdit *randomSeedEdit;
-    /** Button to select the manhattan heuristic for the cheat */
-    QRadioButton *mHeur;
-    /** Button to select the out of place heuristic for the cheat */
-    QRadioButton *oHeur;
-    /** Button to start the game */
-    QPushButton *start;
-    /** Button to display the solution of the board */
-    QPushButton *cheat;
-    /** Button to quit the game */
-    QPushButton *quit;
-    /** Button to clear the solution of the board */
-    QPushButton *clear;
-    /** List displaying the solution of the board */
-    QListView *cheatList;
-    /** Model that contains the solutions of the board, set to ListView */
-    QStringListModel *model;
-    /** Displays errors or messages to user */
-    QLabel *message;
-    
+    /** Text box where user types in his or her name */
     QLineEdit *nameBox;
+    /** Displays score after all lives are lost */
     QLabel *scoreTxt;
+    /** Displays name after all lives are lost */
     QLabel *nameTxt;
+    /** Master layout for determining position of all QWidgets */
     QGridLayout *layout;
-    
-    QPixmap *backcolor;
+    /** Holds initial zapu image */
     QPixmap *yoshi;
+    /** Holds initial ground image */
     QPixmap *ground1;
+    /** Holds end piece ground image */
     QPixmap *ground16;
+    /** Holds extra life egg image */
     QPixmap *eEgg;
+    /** Holds bullet image */
     QPixmap *bulletBill;
+    /** Holds witch image */
     QPixmap *witch;
+    /** Holds initial bowser image */
     QPixmap *bWalk;
+    /** Holds spike image */
     QPixmap *spikeBall;
+    /** Holds bolt image */
     QPixmap *elec;
+    /** Holds 0 image */
     QPixmap *zero;
+    /** Holds 1 image */
     QPixmap *one;
+    /** Holds 2 image */
     QPixmap *two;
+    /** Holds 3 image */
     QPixmap *three;
+    /** Holds 4 image */
     QPixmap *four;
+    /** Holds 5 image */
     QPixmap *five;
+    /** Holds 6 image */
     QPixmap *six;
+    /** Holds 7 image */
     QPixmap *seven;
+    /** Holds 8 image */
     QPixmap *eight;
+    /** Holds 9 image */
     QPixmap *nine;
     
+    /** Holds beginning menu */
     QPixmap *bMenu;
+    /** Holds pause menu */
     QPixmap *pMenu;
+    /** Holds score menu */
     QPixmap *sMenu;
+    /** Holds name menu */
     QPixmap *nMenu;
+    /** Holds name error message */
     QPixmap *error;
+    /** Holds help menu */
     QPixmap *help;
     
+    /** Pointer to main character */
     MainChar *zapu;
-    
+    /** Vector of pointers to things */
     vector<Foreground*> fObjects;
+    /** Vector of pointers to bolts */
     vector<Foreground*> zObjects;
+    /** Vector of pointers to ground objects */
     vector<Background*> bObjects;
+    /** Vector of pointers to menus */
     vector<UI*>menus;
+    /** Vector of pointers to eggs in status bar */
     vector<UI*>eggs;
+    /** Vector of pointers to score in status bar */
     vector<UI*>score;
     
-    /** Timer to animate the movement of tiles */
+    /** Timer to animate the game */
     QTimer *timer;
     
 protected:
+/** Sends signals to main character when key is pressed */
  void keyPressEvent(QKeyEvent *e);
+/** Sends signals to main character when key is released */
  void keyReleaseEvent(QKeyEvent *r);
+/** Used to navigate the menus */
  void mousePressEvent(QMouseEvent *event);
 
 public slots:
-    /** Starts the game when the appropriate button is pressed */
-    void startGame();
-    void findSol();
-    /** Clears the solution when the appropriate button is pressed */
-    void clearSol();
-    /** Animates the tiles after a valid move is requested */
+    /** Determines all of the movements of the game */
     void animate();
 };
 

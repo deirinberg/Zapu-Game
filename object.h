@@ -5,15 +5,23 @@
 
 class Object: public QGraphicsPixmapItem {
 public:
+/** Default Constructor */
 Object (QPixmap *pm, int nx, int ny);
-virtual void move(int count) = 0; //virtual function.
+/** Virtual move function that animates stuff, used in child/grandchild classes */
+virtual void move(int count) = 0; 
 protected: 
+/** Current state of item represented by integer */
 int state;
+/** X position of object */
 int x;
+/** Y position of object */
 int y;
+/** x velocity */
 int vX;
-int vY; //Every thing has a origin and a velocity – maybe 0
-QPixmap *pixMap; //Good idea. Explain later.
+/** y velocity */
+int vY; 
+/** Pointer to pixmap that is set */
+QPixmap *pixMap; 
 };
 
 #endif // OBJECT_H

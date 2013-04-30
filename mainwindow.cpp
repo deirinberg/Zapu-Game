@@ -18,32 +18,42 @@
 
 using namespace std;
 
-void MainWindow::findSol(){
-
-}
-
-void MainWindow::clearSol(){
-
-}
-
+/** Controls all of the movements of the game. If the player lost (vx is -2
+ *  vy is 0 and player's state is -2 it will call the reset function). If
+ *  the game isn't resetting the player will move. If the player is moving or
+ *  the game is resetting the ground will move in the left direction to look 
+ *  like the player is moving in the right direction. If there is a gap the ground
+ *  image will be set to an end piece. If ground pieces go off screen they will be
+ *  cleared and removed from the scene. If the player loses all of their lives the
+ *  game will display their name and score with the option of starting a new game or
+ *  quitting. If they lose only a life the ground will move past the gap and the 
+ *  main character will reappear. Once a tile goes off the screen a ground piece will
+ *  replace it offscreen (randomly generated). If the game isn't resetting a thing
+ *  will be randomly selected and added to the view. Bowser needs 5 pieces of ground
+ *  ahead of him so he doesn't typically float. Animate will then test the collisons 
+ *  (which can only occur between two visible objects). Zapu can bounce off the top
+ *  of bullets (but not their tip) but loses a life hitting them in other places.
+ *  Zapu dies when hitting the witch. If Zapu is in an egg (VX=-2) it can bounce
+ *  back spike balls which will make it lose a life in any other state. Electricity
+ *  bolts are tested to collide with Bowser whose health goes down after each hit.
+ *  Zapu will lose a life by colliding with any part of bowser. Extra life eggs
+ *  can only be generated when the user has 3 lifes or less and are added to the
+ *  status bar when run over. If bad collisions occur zapu's vx is set to -2 and its
+ *  vy is set to 0 so the game can reset. If zapu falls through a gap the game is reset.
+ *  Finally the score is incremented and updated depending on the count duration.
+ *  
+ *  @return nothing
+ */
 void MainWindow::animate(){
-  //view->setFocus();
   QWidget::setFocus();
   bool gen = false;
   if(zapu->getVX() == -2 && zapu->getVY()==0 && zapu->getState()!=-2){
-   //cout<<"VX: "<<zapu->getVX()<<endl;
    zapu->setState(-2);
    zapu->setVisible(false);
-   rCount = count;
    resetting = true;
    reset();
   }
-  else if(zapu->getState() == -2 && (rCount+400) == count){
-   rCount = 0;
-   cout<<"BEFORE RESET\n";
-   reset();
-  } 
-  
+ 
   if(resetting == false){
    zapu->move(count); 
   }
@@ -80,10 +90,8 @@ void MainWindow::animate(){
         QFont font2("Futura", 21, QFont::Bold, true);
         font.setItalic(false);
         font2.setItalic(false);
-        //nameBox->setFixedWidth(22);
         scoreTxt->setText(qscore);
         scoreTxt->setFixedHeight(44);
-        //scoreTxt->setFixedWidth(300);
         scoreTxt->setFont(font);
         scoreLayout->addRow(scoreTxt);
         layout->addLayout(scoreLayout, 162, 228, 1, 100);
@@ -92,26 +100,21 @@ void MainWindow::animate(){
         nameTxt = new QLabel("", this);
         nameTxt->setFixedHeight(32);
         nameTxt->setText(name);
-        //cout<<"NAME: "<<name.toStdString()<<endl;
         nameTxt->setFont(font2);
         nameLayout->addRow(nameTxt);
         layout->addLayout(nameLayout, 161, 122, 1, 100);
         setLayout(layout);
         }
         else{
-        cout<<i<<" "<<bObjects[i]->pos().x()<<" "<<floor<<endl;
-        cout<<"STOPPING\n";
         resetting = false;
         zapu->setVX(0);
         zapu->setVisible(true);
         zapu->setPixmap(*yoshi);
         zapu->setPos(10, floor-75);
-        //zapu = new MainChar(yoshi, 10, floor-75); // Let’s pretend a default constructor
         zapu->setGround(floor);
         }
       }
-   } //end for loop for ground items
-    
+   }
    if(gen == true){
     int shift = bObjects[bObjects.size()-1]->pos().x();
     Ground *g  = new Ground(ground1, shift+64, bObjects[bObjects.size()-1]->pos().y()); 
@@ -120,14 +123,13 @@ void MainWindow::animate(){
     }
     else{
      g->setLimit(12);
-     cout<<"DECREASED LIMIT\n";
     }
     if(genCount != -1){
      genCount++;
     }
     bObjects.push_back(g);
     scene->addItem(bObjects.at(bObjects.size()-1));
-   }//end ground items
+   }
  }
 if(resetting == false){
  if(genCount == 5){
@@ -139,7 +141,6 @@ if(resetting == false){
  }
   int div = 2000*freq;
   if(spiked == false && genCount == -1 && count!= 0 && count%div==0){
-    cout<<"NEW ENEMY\n";
     srand(time(NULL));
     int rn = rand()%4;
     if(rn == 0){
@@ -168,7 +169,6 @@ if(resetting == false){
    for(unsigned int i = 0; i<fObjects.size(); i++){
      fObjects[i]->move(count);
      if(spiked == false && fObjects[i]->getState() == 1){
-      cout<<"SPIKE BALL\n";
        spiked = true;
        Spike *s  = new Spike(spikeBall, 35, -236); 
        fObjects.push_back(s);
@@ -191,13 +191,9 @@ if(resetting == false){
           zapu->setState(1);
          }
          else if(fObjects[i]->getState()==7){
-           cout<<"CASE A\n";
            scene->removeItem(fObjects.at(i));
-           cout<<"CASE B\n";
 	   fObjects.erase(fObjects.begin()+i);
-	   cout<<"CASE C\n";
            addEgg();
-           cout<<"CASE D\n";
          }
         }
         else if(fObjects[i]->getState()!=4){
@@ -207,13 +203,9 @@ if(resetting == false){
           fObjects[i]->collideDown(1);
          }
          else if(fObjects[i]->getState()==7){
-          cout<<"CASE E\n";
           scene->removeItem(fObjects.at(i));
-          cout<<"CASE F\n";
 	  fObjects.erase(fObjects.begin()+i);
-	  cout<<"CASE G\n";
           addEgg();
-          cout<<"CASE H\n";
          }
          else{
           zapu->setVX(-2);
@@ -229,7 +221,6 @@ if(resetting == false){
        if(fObjects[i]->collidesWithItem(fObjects[j])){
           spiked = false;
           bounceBack = false;
-          rCount = 0;
   	  scene->removeItem(fObjects.at(i));
    	  scene->removeItem(fObjects.at(j));
 	  fObjects.erase(fObjects.begin()+i);
@@ -251,7 +242,6 @@ if(resetting == false){
          fObjects.erase(fObjects.begin()+i);
      }
      if(fObjects[i]->pos().x()<-125 || fObjects[i]->pos().y()>110){
-      cout<<"REMOVE BULLET VX: "<<zapu->getVX()<<" VY: "<<zapu->getVY()<<" RC: "<<rCount<<"\n";
       scene->removeItem(fObjects[i]);
       fObjects.erase(fObjects.begin()+i);
      }
@@ -275,10 +265,11 @@ if(resetting == false){
   count++;
 }
 
-void MainWindow::startGame(){
-
-}
-
+/** Adds a life then makes the added life an additional
+ *  visible egg.
+ *
+ *  @return nothing
+ */
 void MainWindow::addEgg(){
   numLives++;
   switch(numLives){
@@ -289,6 +280,15 @@ void MainWindow::addEgg(){
 }
 
 
+/** Called when key is pressed. If the game is going on and
+ *  and the character can move it'll send the signal to the
+ *  class. Each time the key is pressed (not counting duration)
+ *  held down a new electricity bolt will be created and added
+ *  to the screen.
+ *
+ *  @param  QKeyEvent pointer that stores key pressed
+ *  @return nothing
+ */
 void MainWindow::keyPressEvent(QKeyEvent *e){
 if(resetting == false && timer->isActive()){
  if(zapu->getState()!=-2){
@@ -302,6 +302,13 @@ if(resetting == false && timer->isActive()){
 }
 }
 
+/** Called when key is released. If the game is going on and
+ *  and the character can move it'll send the signal to the
+ *  class. Held down releases are ignored.
+ *
+ *  @param  QKeyEvent pointer that stores key released
+ *  @return nothing
+ */
 void MainWindow::keyReleaseEvent(QKeyEvent *r){
 if(resetting == false && timer->isActive()){
  if(zapu->getState()!=-2){
@@ -315,8 +322,16 @@ if(resetting == false && timer->isActive()){
 }
 }
 
+/** Called when mouse is pressed. If the click is inside of a
+ *  button the menu will hide and direct to the right place 
+ *  (sometimes another menu, other times starting a new game,
+ *  also quitting the game). Also stops game if pause button
+ *  pressed 
+ *
+ *  @param  QMouseEvent pointer that stores mouse clicks
+ *  @return nothing
+ */
 void MainWindow::mousePressEvent(QMouseEvent *event){
- // cout<<"HERE\n";
  if(menus[5]->isVisible()){
   menus[0]->setVisible(true);
   menus[5]->setVisible(false);
@@ -335,13 +350,10 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
      nameBox = new QLineEdit();
      QFont font("Futura", 19, QFont::Bold, true);
      font.setItalic(false);
-     //nameBox->setFixedWidth(22);
      nameBox->setFixedHeight(44);
      nameBox->setFont(font);
      layout->addWidget(nameBox, 182, 168, 100, 250);
      setLayout(layout);
-     //scene->addItem(&nameBox);
-     //timer->start();
    }
   }
   else if(event->pos().y()>= 250 && event->pos().y() <= 314){
@@ -367,15 +379,12 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
   }
 }
 if(menus[3]->isVisible()){
-cout<<"HERE\n";
  if(event->pos().x() >= ((WINDOW_MAX_X/2)-68) && event->pos().x()<= (WINDOW_MAX_X/2)+214){
    if(event->pos().y()>= 265 && event->pos().y() <= 329){
-   cout<<"DOUBLE HERE\n";
    if(nameBox->text().isEmpty()){
     menus[4]->setVisible(true);
    }
    else{
-    cout<<"Triple HERE\n";
     name = nameBox->text();
     delete nameBox;
     menus[3]->setVisible(false);
@@ -387,7 +396,6 @@ cout<<"HERE\n";
 else if(timer->isActive()){
  if(event->pos().x() >= (WINDOW_MAX_X-66) && event->pos().x()<= WINDOW_MAX_X){
    if(event->pos().y()>= 0 && event->pos().y() <= 55){
-    cout<<"PAUSE"<<endl;
     timer->stop();
     menus[0]->setVisible(true);
     menus[1]->setVisible(true);
@@ -395,15 +403,21 @@ else if(timer->isActive()){
 }
 }
 
+/** Called when player loses a life. Reset is set to true and
+ *  necessary default values are set as well. Things and bolts
+ *  are cleared and removed from the scene. The number of lives
+ *  is then decreased by one and an egg on the status bar 
+ *  disappears. 
+ *
+ *  @return nothing
+ */
 void MainWindow::reset(){
  resetting = true;
  spiked = false;
  genCount = -1;
- rCount = 0;
  bounceBack = false;
  while(!fObjects.empty()){
    scene->removeItem(fObjects.at(0));
-   //delete fObjects.back();
    fObjects.erase(fObjects.begin());
  }
  while(!zObjects.empty()){
@@ -412,13 +426,21 @@ void MainWindow::reset(){
  }
  numLives--;
  switch(numLives){
-  case 0: eggs[0]->setVisible(false); /* reset */
+  case 0: eggs[0]->setVisible(false); 
   case 1: eggs[1]->setVisible(false); break;
   case 2: eggs[2]->setVisible(false); break;
   case 3: eggs[3]->setVisible(false); break;
  }
 }
 
+/** Speeds up game and increases frequency of enemies depending
+ *  on score. The score is then translated into images (custom
+ *  font) that is displayed on the status bar. These images are
+ *  returned from another class as pointers and then set as 
+ *  qpixmaps.
+ *
+ *  @return nothing
+ */
 void MainWindow::updateScore(){
    int thous, hunds, tens, ones;
    if(points > 100){
@@ -473,6 +495,10 @@ void MainWindow::updateScore(){
  }
 }
 
+/** Returns corresponding image depending on number.
+ *
+ *  @return pointer to numerical qpixmap
+ */
 QPixmap* MainWindow::scoreImage(int num){
  QPixmap *p = zero;
  switch(num){
@@ -489,6 +515,13 @@ QPixmap* MainWindow::scoreImage(int num){
   return p;
 }
 
+/** Clears all objects and resets variables to default values. 
+ *  The status bar (score and eggs are reset to default images).
+ *  A new main character will be generated if it hasn't been 
+ *  deleted. The timer (linked to animate()) will start again.
+ *
+ *  @return nothing
+ */
 void MainWindow::newGame(){
  while(!fObjects.empty()){
    scene->removeItem(fObjects.at(0));
@@ -513,7 +546,6 @@ void MainWindow::newGame(){
   count = 0;
   points = 0;    
   numLives = 3;
-  rCount = 0;
   freq = 1;
   resetting = false;
   spiked = false;
@@ -528,7 +560,7 @@ void MainWindow::newGame(){
   }
  if(zapu == NULL){
   yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
-  zapu = new MainChar(yoshi, 10, bObjects.at(0)->pos().y()-75); // Let’s pretend a default constructor
+  zapu = new MainChar(yoshi, 10, bObjects.at(0)->pos().y()-75); 
   scene->addItem(zapu);
  }
  else{
@@ -561,96 +593,22 @@ if(!timer->isActive()){
 /** MainWindow default constructor. A new scene is created a view is set to
  *  it with it's parent as scene. A new grid layout and form layout (for
  *  the view are created. New form layouts are created for each QLabel (text)
- *  and are added to the grid layouts in the appropriate locations. A view
- *  is created with the appropriate size, added to a form layout and then
- *  placed in the grid layout. QWidgets (QLineEdits, QRadioButtons, QPushButtons
- *  and QListView) are added to the grid layout without the need of form 
- *  layouts. QPushButtons are linked to the appropriate functions (called when
- *  clicked). QListView is set a maximum width and maximum height to improve
- *  the UI. The timer is set to the slot animate with a duration of 4. Count
- *  is set to 0 and updateCheat is set to false (default values). Finally
- *  the layout is set to the grid layout.
- *  
+ *  and are added to the grid layouts in the appropriate locations. Many QPixmaps
+ *  are initialized with selected images. Variables are set to their default values.
+ *  All items are then added to the scene in their initial states.
+ *
  *  @return nothing
  */
 MainWindow::MainWindow()  {
-    statusBar = new QGraphicsView();
     scene = new QGraphicsScene();
     view = new QGraphicsView(scene);
     layout = new QGridLayout(); 
     QFormLayout *viewLayout = new QFormLayout();
-    //viewLayout = new QFormLayout();
-    
- /* QFormLayout *messageLayout = new QFormLayout();
-    message = new QLabel("", this);
-    messageLayout->addRow(message);
-    layout->addLayout(messageLayout, 0, 0, 1, 9);
-    
-    QFormLayout *sizeLayout = new QFormLayout();
-    QLabel *sizeTxt = new QLabel("Size", this);
-    sizeLayout->addRow(sizeTxt);
-    layout->addLayout(sizeLayout, 1, 9, 1, 1);
-    
-    QFormLayout *initLayout = new QFormLayout();
-    QLabel *initTxt = new QLabel("Initial Moves", this);
-    initLayout->addRow(initTxt);
-    layout->addLayout(initLayout, 2, 9, 1, 1);
-    
-    QFormLayout *randomLayout = new QFormLayout();
-    QLabel *randomTxt = new QLabel("Random Seed #", this);
-    randomLayout->addRow(randomTxt);
-    layout->addLayout(randomLayout, 3, 9, 1, 1);
-    
-    QFormLayout *heurLayout = new QFormLayout();
-    QLabel *heurTxt = new QLabel("Heuristic: ", this);
-    heurLayout->addRow(heurTxt);
-    layout->addLayout(heurLayout, 4, 9, 1, 1);
-    
-    sizeEdit = new QLineEdit(); 
-    layout->addWidget(sizeEdit, 1, 10, 1, 1);
-    
-    startMovesEdit = new QLineEdit(); 
-    layout->addWidget(startMovesEdit, 2, 10, 1, 1);
-    
-    randomSeedEdit = new QLineEdit(); 
-    layout->addWidget(randomSeedEdit, 3, 10, 1, 1);
-    
-    mHeur = new QRadioButton("Manhattan");
-    layout->addWidget(mHeur, 4, 10, 1, 1);
-
-    oHeur = new QRadioButton(("Out Of Place"));
-    layout->addWidget(oHeur, 5, 10, 1, 1);
-    
-    start = new QPushButton("Start");
-    connect( start, SIGNAL(clicked()), SLOT(startGame()) );
-    layout->addWidget(start, 6, 9, 1, 1); 
-    
-    ///// You'll need this later ///////
-    quit = new QPushButton("Quit", this );
-    connect( quit, SIGNAL(clicked()), qApp, SLOT(quit()) );
-    layout->addWidget(quit, 6, 10, 1, 1);
-
-    cheat = new QPushButton("Cheat");
-    connect(cheat, SIGNAL(clicked()), SLOT(findSol()) );
-    layout->addWidget(cheat, 7, 9, 1, 1);
-    
-    clear = new QPushButton("Hide Cheat", this );
-    connect(clear, SIGNAL(clicked()), SLOT(clearSol()));
-    layout->addWidget(clear, 7, 10, 1, 1);
-    
-    cheatList = new QListView();
-    cheatList->setMaximumWidth(127);
-    cheatList->setMaximumHeight(153);
-    layout->addWidget(cheatList, 8, 10, 1, 1);
-    */
- 
- // updateCheat = false;
-    
+  
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
     timer->setInterval(6);
-    //timer->start();
-    
+
     zero = new QPixmap(qApp->applicationDirPath()+"/Pictures/0.png");
     one = new QPixmap(qApp->applicationDirPath()+"/Pictures/1.png");
     two = new QPixmap(qApp->applicationDirPath()+"/Pictures/2.png");
@@ -684,19 +642,12 @@ MainWindow::MainWindow()  {
     count = 0;
     points = 0;
     numLives = 3;
-    rCount = 0;
     freq = 1;
     resetting = false;
     spiked = false;
     bounceBack = false;
     genCount = -1;
-   /* status.load(qApp->applicationDirPath()+"/Pictures/StatusBarPause.png");  
-    statusBar->setFixedSize(WINDOW_MAX_X, 61);
-    palette.setBrush(statusBar->backgroundRole(), status);
-    statusBar->setPalette(palette);
-    viewLayout->addRow(statusBar);
-    viewLayout->setVerticalSpacing(0);*/
-    
+  
     scene->setSceneRect(0, -WINDOW_MAX_Y+50, WINDOW_MAX_X-4, WINDOW_MAX_Y-4);
     view->setFixedSize(WINDOW_MAX_X, WINDOW_MAX_Y);
     viewLayout->addRow(view);
@@ -708,8 +659,6 @@ MainWindow::MainWindow()  {
     QWidget::setFocus();
     layout->addLayout(viewLayout, 0, 0, 506, 466);
 
-    //World *w  = new World(world, 0, -341); // Let’s pretend a default constructor
-    //bObjects.push_back(w);
     QPixmap *ground = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
    for(int i = 1; i<=12; i++){
     Ground *g  = new Ground(ground, (i-1)*64, 20); 
@@ -717,7 +666,7 @@ MainWindow::MainWindow()  {
     bObjects.push_back(g);
     }
     yoshi = new QPixmap(qApp->applicationDirPath()+"/Pictures/YW1.png");
-    zapu = new MainChar(yoshi, 10, -55); // Let’s pretend a default constructor
+    zapu = new MainChar(yoshi, 10, -55); 
     scene->addItem(zapu);
     for (unsigned int i=0; i<bObjects.size(); i++ ) {
      scene->addItem(bObjects.at(i));
@@ -769,24 +718,39 @@ void MainWindow::show() {
 }
 
 /** Destructor for MainWindow. Clears and deletes all items in order of
- *  their hierarchy (buttons then layouts then main layout).
+ *  their hierarchy (qpixmaps then scene then view).
  *  
  *  @return nothing
  */
 MainWindow::~MainWindow(){
     delete timer;
- /* delete message;
-    delete sizeEdit;
-    delete startMovesEdit;
-    delete randomSeedEdit;
-    delete mHeur;
-    delete oHeur;
-    delete start;
-    delete cheat;
-    delete quit;
-    delete clear;
-    delete cheatList;
-    delete layout;*/
+
+    delete zero;
+    delete one;
+    delete two;
+    delete three;
+    delete four;
+    delete five;
+    delete six;
+    delete seven;
+    delete eight;
+    delete nine;
+    
+    delete bMenu;
+    delete pMenu;
+    delete sMenu;
+    delete nMenu;
+    delete error;
+    delete help;
+        
+    delete ground1;
+    delete ground16;
+    delete eEgg;
+    delete bulletBill;
+    delete witch;
+    delete spikeBall;
+    delete bWalk;
+    delete elec;
     delete scene;
     delete view;
 }
