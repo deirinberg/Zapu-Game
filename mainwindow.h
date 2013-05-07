@@ -73,6 +73,8 @@ public:
     void updateScore();
     /** Adds an egg (life) to the status bar */
     void addEgg();
+    /** Updates the background image */
+    void updateWorld();
     /** Holds the name of the user */
     QString name;
     /** Returns the numerical image used for generating the score */
@@ -90,6 +92,8 @@ private:
     QLabel *nameTxt;
     /** Master layout for determining position of all QWidgets */
     QGridLayout *layout;
+    /** Stores, set as background image for view */
+    QPixmap world;
     /** Holds initial zapu image */
     QPixmap *yoshi;
     /** Holds initial ground image */

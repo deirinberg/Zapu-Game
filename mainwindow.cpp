@@ -449,22 +449,26 @@ void MainWindow::reset(){
  */
 void MainWindow::updateScore(){
    int thous, hunds, tens, ones;
-   if(points > 100){
+   if(points == 100){
     timer->setInterval(5);
+    world.load(qApp->applicationDirPath()+"/Pictures/SnowBackground.png");
+    updateWorld();
+    freq = 0.60;
+   }
+   else if(points == 250){
+    world.load(qApp->applicationDirPath()+"/Pictures/DarkBackground.png");
+    updateWorld();
     freq = 0.40;
    }
-   else if(points >250){
+   else if(points == 500){
+    timer->setInterval(4);
+    freq = 0.25;
+   }
+   else if(points == 750){
     freq = 0.10;
    }
-   else if(points > 500){
-   timer->setInterval(4);
-   freq = 0.02;
-   }
-   else if(points > 750){
-    freq = 0.01;
-   }
-   else if(points > 1000){
-    freq = 0.005;
+   else if(points == 1000){
+    freq = 0.05;
    }
  if(points < 10){
    score[0]->setPixmap(*scoreImage(points));
@@ -549,6 +553,9 @@ void MainWindow::newGame(){
    scene->removeItem(score.at(0));
    score.erase(score.begin());
  }
+  world.load(qApp->applicationDirPath()+"/Pictures/fullView.png");
+  updateWorld();
+  
   count = 0;
   points = 0;    
   numLives = 3;
@@ -597,6 +604,12 @@ if(!timer->isActive()){
  }
 }
 
+void MainWindow::updateWorld() {
+  QPalette palette;  
+  palette.setBrush(view->backgroundRole(), world);
+  view->setPalette(palette);
+}
+
 /** MainWindow default constructor. A new scene is created a view is set to
  *  it with it's parent as scene. A new grid layout and form layout (for
  *  the view are created. New form layouts are created for each QLabel (text)
@@ -642,9 +655,8 @@ MainWindow::MainWindow()  {
     spikeBall = new QPixmap(qApp->applicationDirPath() + "/Pictures/SpikeBall.png");
     bWalk = new QPixmap(qApp->applicationDirPath() + "/Pictures/bWalk1.png");
     elec = new QPixmap(qApp->applicationDirPath() + "/Pictures/Bolt.png");
-    QPalette palette;
-    QPixmap world, status;
     world.load(qApp->applicationDirPath()+"/Pictures/fullView.png");
+    updateWorld();
     
     count = 0;
     points = 0;
@@ -664,8 +676,6 @@ MainWindow::MainWindow()  {
     view->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    palette.setBrush(view->backgroundRole(), world);
-    view->setPalette(palette);
     QWidget::setFocus();
     layout->addLayout(viewLayout, 0, 0, 506, 466);
 
