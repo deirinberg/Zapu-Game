@@ -499,6 +499,7 @@ void MainChar::jump(int num){
     moveBy(0, yi-yf); 
    if(pos().y() < -326){
     moveBy(0, -pos().y()-326);
+    cout<<"HERE??? "<<pos().y()<<endl;
    }
    if(ty > 100){
     walking = false;

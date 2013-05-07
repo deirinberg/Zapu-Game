@@ -25,6 +25,7 @@
 #include <QPixmap>
 #include "foreground.h"
 #include "background.h"
+#include "highscores.h"
 
 /** Forward declaration to avoid importing the same thing */
 class UI;
@@ -140,6 +141,8 @@ private:
     QPixmap *error;
     /** Holds help menu */
     QPixmap *help;
+    
+    HighScores *hs;
     
     /** Pointer to main character */
     MainChar *zapu;

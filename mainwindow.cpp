@@ -53,19 +53,23 @@ void MainWindow::animate(){
    resetting = true;
    reset();
   }
- 
   if(resetting == false){
    zapu->move(count); 
+    if(zapu->pos().y() > 36){
+     reset();
+    }
   }
   if(zapu->getVX() == 1 || resetting == true){
    for(unsigned int i = 0; i<bObjects.size(); i++){
     bObjects[i]->move(count);
-    if(i == 0){
-      floor = bObjects[i]->pos().y();
-      if(bObjects[i]->pos().x() <-24 && (bObjects[i+1]->pos().x()>82)){
+    if(resetting == false){
+      floor = bObjects[0]->pos().y();
+      if(bObjects[0]->pos().x()>=90 || (bObjects[0]->pos().x()<=-54 && bObjects[1]->pos().x()>=90)){
         floor = 500;
        }
+      if(zapu->pos().y() < 36){
        zapu->setGround(floor);
+      }
      }
      int last = 0;
      if(i == bObjects.size()-1){
@@ -82,6 +86,7 @@ void MainWindow::animate(){
      else if(bObjects[i]->pos().x() == 0 && resetting == true && timer->isActive()){
         if(numLives==0){
         timer->stop();
+        hs->update(name.toStdString(), points);
         menus[2]->setVisible(true);
         QFormLayout *scoreLayout = new QFormLayout();
         scoreTxt = new QLabel("", this);
@@ -258,9 +263,6 @@ if(resetting == false){
      zObjects.erase(zObjects.begin()+i);
     }
    }
-  if(zapu->pos().y() > 35){
-    reset();
-   }
   if(zapu->getVX() == 1 && count%50 == 0){
     points++;
     updateScore();
@@ -341,7 +343,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
   menus[5]->setVisible(false);
  }
 if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
-   if(event->pos().y()>= 160 && event->pos().y() <= 224){
+   if(event->pos().y()>= 152 && event->pos().y() <= 216){
     if(menus[1]->isVisible()){
       menus[1]->setVisible(false);
       menus[0]->setVisible(false);
@@ -360,7 +362,7 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
      setLayout(layout);
    }
   }
-  else if(event->pos().y()>= 250 && event->pos().y() <= 314){
+  else if(event->pos().y()>= 242 && event->pos().y() <= 306){
       if(menus[1]->isVisible() || menus[2]->isVisible()){
       if(menus[2]->isVisible()){
          delete nameTxt;
@@ -376,7 +378,7 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
       menus[5]->setVisible(true);
      }
   }
-  else if(event->pos().y()>= 340 && event->pos().y() <= 404){
+  else if(event->pos().y()>= 332 && event->pos().y() <= 396){
    if(menus[0]->isVisible() || menus[1]->isVisible() || menus[2]->isVisible()){
     qApp->quit();
     }
@@ -384,7 +386,7 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
 }
 if(menus[3]->isVisible()){
  if(event->pos().x() >= ((WINDOW_MAX_X/2)-68) && event->pos().x()<= (WINDOW_MAX_X/2)+214){
-   if(event->pos().y()>= 265 && event->pos().y() <= 329){
+   if(event->pos().y()>= 257 && event->pos().y() <= 321){
    if(nameBox->text().isEmpty()){
     menus[4]->setVisible(true);
    }
@@ -653,6 +655,8 @@ MainWindow::MainWindow()  {
     bounceBack = false;
     moreGaps = false;
     genCount = -1;
+    
+    hs = new HighScores();
   
     scene->setSceneRect(0, -WINDOW_MAX_Y+50, WINDOW_MAX_X-4, WINDOW_MAX_Y-4);
     view->setFixedSize(WINDOW_MAX_X, WINDOW_MAX_Y);
@@ -678,17 +682,17 @@ MainWindow::MainWindow()  {
      scene->addItem(bObjects.at(i));
     }
     
-    UI *menu1 = new UI(bMenu, 0, -410, true);
+    UI *menu1 = new UI(bMenu, 0, -418, true);
     menus.push_back(menu1);
-    UI *menu2 = new UI(pMenu, 0, -410, false);
+    UI *menu2 = new UI(pMenu, 0, -418, false);
     menus.push_back(menu2);
-    UI *menu3 = new UI(sMenu, 0, -410, false);
+    UI *menu3 = new UI(sMenu, 0, -418, false);
     menus.push_back(menu3);
-    UI *menu4 = new UI(nMenu, 0, -410, false);
+    UI *menu4 = new UI(nMenu, 0, -418, false);
     menus.push_back(menu4);
-    UI *nError = new UI(error, 50, -275, false);
+    UI *nError = new UI(error, 50, -281, false);
     menus.push_back(nError);
-    UI *hMenu = new UI(help, 0, -410, false);
+    UI *hMenu = new UI(help, 0, -418, false);
     menus.push_back(hMenu);
     
     QPixmap *bwEgg;
