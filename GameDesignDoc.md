@@ -54,6 +54,8 @@ Increases with the distance zapu covers.
 Once the score hits certain amounts the speed of the game will increase even more leading to higher scores.
 Higher scores also increase the frequency of the enemies.
 
+The high scores list can be viewed by clicking the scores button on the main (opening menu). It lists the top 15 scores.
+
 ## Levels
 
 There are 3 different levels in the game. When the user has 100 points the background changes to level 2 (snowy background).
