@@ -4,7 +4,7 @@
 
 class HeatBullet: public Foreground {
  public:
- /** Default constructor for bullet */
+ /** Default constructor for heat bullet */
  HeatBullet (QPixmap *pm, int nx, int ny);
  /** Animates heat bullet */
  void move(int count); 
@@ -33,7 +33,7 @@ HeatBullet::HeatBullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny )
  sinking = false;
 }
 
-/** Moves bullet back 2 pixels forward when a duration has elapsed and
+/** Moves bullet back 3 pixels forward when a duration has elapsed and
  *  it isn't sinking. If it is sinking it moves down 2 pixels.
  *
  * @param count of how much time has elapsed since start of game
@@ -74,4 +74,4 @@ void HeatBullet::collideDown(int num){
  }
 }
 
-#endif // BULLET_H
+#endif // HEATBULLET_H

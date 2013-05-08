@@ -34,7 +34,7 @@ using namespace std;
  *  quitting. If they lose only a life the ground will move past the gap and the 
  *  main character will reappear. Once a tile goes off the screen a ground piece will
  *  replace it offscreen (randomly generated). If the game isn't resetting a thing
- *  will be randomly selected and added to the view. Bowser needs 5 pieces of ground
+ *  will be randomly selected and added to the view. Bowser/Fire Bowser need 5 pieces of ground
  *  ahead of him so he doesn't typically float. Animate will then test the collisons 
  *  (which can only occur between two visible objects). Zapu can bounce off the top
  *  of bullets (but not their tip) but loses a life hitting them in other places.
@@ -45,6 +45,8 @@ using namespace std;
  *  can only be generated when the user has 3 lifes or less and are added to the
  *  status bar when run over. If bad collisions occur zapu's vx is set to -2 and its
  *  vy is set to 0 so the game can reset. If zapu falls through a gap the game is reset.
+ *  When the user loses all of his or her lives the high score object hs calls
+ *  update so the user's name and score can be potentially added to the high scores list.
  *  Finally the score is incremented and updated depending on the count duration.
  *  
  *  @return nothing
@@ -511,10 +513,11 @@ void MainWindow::reset(){
 }
 
 /** Speeds up game and increases frequency of enemies depending
- *  on score. The score is then translated into images (custom
- *  font) that is displayed on the status bar. These images are
- *  returned from another class as pointers and then set as 
- *  qpixmaps.
+ *  on score. If score is 100 or 250 the background image will
+ *  change in the updateWorld function (level up). The score is 
+ *  then translated into images (custom font) that is displayed 
+ *  on the status bar. These images are returned from another 
+ *  class as pointers and then set as qpixmaps.
  *
  *  @return nothing
  */
@@ -686,9 +689,10 @@ void MainWindow::updateWorld() {
 /** MainWindow default constructor. A new scene is created a view is set to
  *  it with it's parent as scene. A new grid layout and form layout (for
  *  the view are created. New form layouts are created for each QLabel (text)
- *  and are added to the grid layouts in the appropriate locations. Many QPixmaps
- *  are initialized with selected images. Variables are set to their default values.
- *  All items are then added to the scene in their initial states.
+ *  and are added to the grid layouts in the appropriate locations. A new high scores
+ *  object is created. Many QPixmaps are initialized with selected images. Variables 
+ *  are set to their default values. All items are then added to the scene in their
+ *  initial states.
  *
  *  @return nothing
  */
@@ -697,7 +701,7 @@ MainWindow::MainWindow()  {
     view = new QGraphicsView(scene);
     layout = new QGridLayout(); 
     QFormLayout *viewLayout = new QFormLayout();
-  
+    
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
     timer->setInterval(6);

@@ -2,6 +2,12 @@
 #include <iomanip>
 #include <sstream>
 
+/** Default constructor- Opens up "HSList.txt". If the file has already been created it will read in only
+ *  the user name and score using a stringstream and then store them in the appropriate vectors. It will
+ *  finally close the input text file.
+ *
+ *  @return nothing
+ */
 HighScores::HighScores(){
  ifstream fin;
  ofstream fout;
@@ -27,6 +33,16 @@ HighScores::HighScores(){
  fin.close();
 }
 
+/** Updates the HSList.txt file after a user has lost. If there are no high scores or the user scored worse
+ *  than other users it will be added to the end of each vector. If not the score will be sorted through
+ *  the high scores list and inserted at the appropriate location. Finally an ofstream object will open
+ *  up the "HSList.txt" file and rewrite it with a header "Zapu High scores". It will then remove the
+ *  names/scores if there are more than 15 and write them all to the file. 
+ *
+ *  @param name of user that could potentially be added to the high scores
+ *  @param int score that could potentially be added to high scores
+ *  @return nothing
+ */
 void HighScores::update(string name, int score){
   if(scores.size() == 0 || score < scores.at(scores.size()-1)){
    names.push_back(name);

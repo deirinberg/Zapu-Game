@@ -22,7 +22,7 @@ class FireBowser: public Foreground {
 
 /** Default constructor- sets pos to parameters (ny-75 = ground),
  *  zValue to 2 so above ground and state to 3 because it reacts
- *  to bolts. Health is initially set to 5.
+ *  to bolts. Health is initially set to 3.
  *
  *  @param pointer to QPixmap
  *  @param x position
@@ -36,7 +36,7 @@ FireBowser::FireBowser(QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) 
  health = 3;
 }
 
-/** Moves bowser forward 2 pixels forward when a duration has elapsed and
+/** Moves bowser 2 pixels left when a duration has elapsed and
  *  it isn't shocked. If it is shocked it sets it to false so it can move
  *  next time. If a longer time has elapsed and bowser is still alive walk()
  *  will be called.
@@ -59,6 +59,7 @@ if(count%50 == 0 && health != 0){
 }
 
 /** Alternates images to make bowser appear like he's walking
+ *  If fire bowser is jumping (depends on it's y position) it's image will change to make it look like it is.
  *
  *  @param count of how much time has elapsed since start of game
  *  @return nothing
