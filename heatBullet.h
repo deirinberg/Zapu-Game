@@ -42,7 +42,7 @@ HeatBullet::HeatBullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny )
 void HeatBullet::move(int count) {
 if(count%3 == 0){
  if(sinking == false){
-  moveBy(-2, 0);
+  moveBy(-3, 0);
  }
  else{
   moveBy(0, 2);

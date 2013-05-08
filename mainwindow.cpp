@@ -6,6 +6,7 @@
 #include <QFile>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include "mainchar.h"
 #include "bolt.h"
 #include "background.h"
@@ -198,12 +199,17 @@ if(resetting == false){
    }
   }
   for(unsigned int i = 0; i<fObjects.size(); i++){
-     fObjects[i]->move(count);
      int state = fObjects[i]->getState();
-   if(state == -2){
+     if(state!=4 && state!=7){
+      fObjects[i]->move(count);
+     }
+     else if((state == 4 || state == 7) && zapu->getVX()==1){
+      fObjects[i]->move(count);
+     }
+   if(state == -2 && fObjects[i]->pos().x()>250){
       fObjects[i]->setPos(fObjects[i]->pos().x(), zapu->pos().y());
    }
-   if(state == 5 && fObjects[i]->pos().x()>250){
+   if(state == 5){
      fObjects[i]->setPos(fObjects[i]->pos().x(), zapu->pos().y());
     if(count%800==0 && fObjects[i]->pos().y()<500){
      FireBall *f  = new FireBall(fire, fObjects[0]->pos().x(), fObjects[0]->pos().y()+5); 
@@ -452,7 +458,11 @@ if(menus[3]->isVisible()){
     menus[4]->setVisible(true);
    }
    else{
-    name = nameBox->text();
+    string fullName = nameBox->text().toStdString();
+    stringstream ss(fullName);
+    string firstName;
+    getline(ss, firstName, ' ');
+    name = QString::fromStdString(firstName);
     delete nameBox;
     menus[3]->setVisible(false);
     menus[4]->setVisible(false);
