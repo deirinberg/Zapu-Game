@@ -12,18 +12,13 @@ HighScores::HighScores(){
   getline(fin, line);
    while(!fin.eof()){
     getline(fin, line);
-    cout<<"LINE: "<<line<<endl;
     stringstream ss(line);
     ss>>num;
-    cout<<"NUM: "<<num<<endl;
     getline(ss, line, ' ');
-    cout<<"P1A: "<<line<<endl;
     if(num < 10){
     getline(ss, line, ' ');
-    cout<<"P1B: "<<line<<endl;
     }
     getline(ss, line, ' ');
-    cout<<"P2:  "<<line<<endl;
     names.push_back(line);
     ss>>score;
     scores.push_back(score);
@@ -56,11 +51,9 @@ void HighScores::update(string name, int score){
   for(unsigned int j = 0; j<names.size(); j++){
    if(j<=8){
    fout<<endl<<left<<j+1<<".  "<<setw(12)<<names.at(j)<<" "<<scores.at(j);
-   cout<<endl<<left<<j+1<<".  "<<setw(12)<<names.at(j)<<" "<<scores.at(j);
    }
    else{
    fout<<endl<<left<<j+1<<". "<<setw(12)<<names.at(j)<<" "<<scores.at(j);
-   cout<<endl<<left<<j+1<<". "<<setw(12)<<names.at(j)<<" "<<scores.at(j);
    }
   }
 }

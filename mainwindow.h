@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStringListModel>
+#include <QListView>
 #include <QWidget>
 #include <QLabel>
 #include <QGraphicsScene>
@@ -88,6 +90,10 @@ private:
     QGraphicsView *view;
     /** Text box where user types in his or her name */
     QLineEdit *nameBox;
+    /** Model that contains the high scores of the game */
+    QStringListModel *model;
+    /** List displaying high scores of the game */
+    QListView *scoresList;
     /** Displays score after all lives are lost */
     QLabel *scoreTxt;
     /** Displays name after all lives are lost */
@@ -151,6 +157,8 @@ private:
     QPixmap *error;
     /** Holds help menu */
     QPixmap *help;
+    /** Holds high score menu */
+    QPixmap *hsMenu;
     
     HighScores *hs;
     

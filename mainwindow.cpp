@@ -5,6 +5,7 @@
 #include <QtAlgorithms>
 #include <QFile>
 #include <string>
+#include <fstream>
 #include "mainchar.h"
 #include "bolt.h"
 #include "background.h"
@@ -115,7 +116,6 @@ void MainWindow::animate(){
         setLayout(layout);
         }
         else{
-        cout<<"HERE?\n";
         zapu->setVX(0);
         zapu->setVisible(true);
         zapu->setPixmap(*yoshi);
@@ -206,7 +206,6 @@ if(resetting == false){
    if(state == 5 && fObjects[i]->pos().x()>250){
      fObjects[i]->setPos(fObjects[i]->pos().x(), zapu->pos().y());
     if(count%800==0 && fObjects[i]->pos().y()<500){
-     cout<<"NEW FIRE BALL!\n";
      FireBall *f  = new FireBall(fire, fObjects[0]->pos().x(), fObjects[0]->pos().y()+5); 
      fObjects.push_back(f);
      scene->addItem(fObjects[fObjects.size()-1]);
@@ -373,19 +372,15 @@ if(resetting == false && timer->isActive()){
  *  @return nothing
  */
 void MainWindow::mousePressEvent(QMouseEvent *event){
- if(menus[5]->isVisible()){
+ if(menus[5]->isVisible() || menus[6]->isVisible()){
   menus[0]->setVisible(true);
   menus[5]->setVisible(false);
+  menus[6]->setVisible(false);
+  scoresList->setVisible(false);
  }
-if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
-   if(event->pos().y()>= 152 && event->pos().y() <= 216){
-    if(menus[1]->isVisible()){
-      menus[1]->setVisible(false);
-      menus[0]->setVisible(false);
-      zapu->setVX(0);
-      timer->start();
-     }
-     else if(menus[0]->isVisible()){
+else if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_X/2)+141){
+  if(menus[0]->isVisible()){
+   if(event->pos().y()>= 146 && event->pos().y() <= 202){
      menus[0]->setVisible(false);
      menus[3]->setVisible(true);
      nameBox = new QLineEdit();
@@ -396,6 +391,41 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
      layout->addWidget(nameBox, 182, 168, 100, 250);
      setLayout(layout);
    }
+   else if(event->pos().y()>= 211 && event->pos().y() <= 267){
+     menus[0]->setVisible(false);
+     menus[5]->setVisible(true);
+   }
+   else if(event->pos().y()>= 276 && event->pos().y() <= 332){
+     menus[0]->setVisible(false);
+     menus[6]->setVisible(true);
+     scoresList->setVisible(true);
+     QStringList scores;
+     ifstream fin;
+     fin.open("HSList.txt");
+     if(fin.good()){
+      string line;
+      while(!fin.eof()){
+       getline(fin, line);
+       QString qline = QString::fromStdString(line);
+       scores<<qline;
+      }
+     }
+      model = new QStringListModel(scoresList);
+      model->setStringList(scores);
+      scoresList->setModel(model);
+      fin.close();
+   }
+   else if(event->pos().y()>= 341 && event->pos().y() <= 397){
+      qApp->quit();
+   }
+  }
+   if(event->pos().y()>= 152 && event->pos().y() <= 216){
+    if(menus[1]->isVisible()){
+      menus[1]->setVisible(false);
+      menus[0]->setVisible(false);
+      zapu->setVX(0);
+      timer->start();
+     }
   }
   else if(event->pos().y()>= 242 && event->pos().y() <= 306){
       if(menus[1]->isVisible() || menus[2]->isVisible()){
@@ -408,13 +438,9 @@ if(event->pos().x() >= ((WINDOW_MAX_X/2)-141) && event->pos().x()<= (WINDOW_MAX_
        menus[1]->setVisible(false);
        menus[2]->setVisible(false);
       }
-     else if(menus[0]->isVisible()){
-      menus[0]->setVisible(false);
-      menus[5]->setVisible(true);
-     }
   }
   else if(event->pos().y()>= 332 && event->pos().y() <= 396){
-   if(menus[0]->isVisible() || menus[1]->isVisible() || menus[2]->isVisible()){
+   if(menus[1]->isVisible() || menus[2]->isVisible()){
     qApp->quit();
     }
   }
@@ -635,7 +661,9 @@ void MainWindow::newGame(){
   }
  score[0]->setVisible(true);
 if(!timer->isActive()){
+  timer->setInterval(6);
   timer->start();
+  freq = 1.0;
  }
 }
 
@@ -681,6 +709,7 @@ MainWindow::MainWindow()  {
     nMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/NameMenu.png");
     error = new QPixmap(qApp->applicationDirPath()+"/Pictures/NameError.png");
     help = new QPixmap(qApp->applicationDirPath()+"/Pictures/Help.png");
+    hsMenu = new QPixmap(qApp->applicationDirPath()+"/Pictures/Scores.png");
         
     ground1 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground1.png");
     ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
@@ -715,6 +744,12 @@ MainWindow::MainWindow()  {
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     QWidget::setFocus();
     layout->addLayout(viewLayout, 0, 0, 506, 466);
+    
+    scoresList = new QListView();
+    scoresList->setMaximumWidth(150);
+    scoresList->setMaximumHeight(350);
+    scoresList->setVisible(false);
+    layout->addWidget(scoresList, 62, 164, 350, 150);
 
     QPixmap *ground = new QPixmap(qApp->applicationDirPath()+"/Pictures/Ground1.png");
    for(int i = 1; i<=12; i++){
@@ -741,6 +776,8 @@ MainWindow::MainWindow()  {
     menus.push_back(nError);
     UI *hMenu = new UI(help, 0, -418, false);
     menus.push_back(hMenu);
+    UI *menu5 = new UI(hsMenu, 0, -418, false);
+    menus.push_back(menu5);
     
     QPixmap *bwEgg;
     UI *uiItem, *num;
