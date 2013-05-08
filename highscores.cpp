@@ -17,9 +17,8 @@ HighScores::HighScores(){
     ss>>num;
     cout<<"NUM: "<<num<<endl;
     getline(ss, line, ' ');
-    getline(ss, line, ' ');
     cout<<"P1A: "<<line<<endl;
-    if(num >= 10){
+    if(num < 10){
     getline(ss, line, ' ');
     cout<<"P1B: "<<line<<endl;
     }

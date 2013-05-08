@@ -1,11 +1,11 @@
-#ifndef BULLET_H
-#define BULLET_H
+#ifndef HEATBULLET_H
+#define HEATBULLET_H
 #include "foreground.h"
 
-class Bullet: public Foreground {
+class HeatBullet: public Foreground {
  public:
  /** Default constructor for bullet */
- Bullet (QPixmap *pm, int nx, int ny);
+ HeatBullet (QPixmap *pm, int nx, int ny);
  /** Animates bullet */
  void move(int count); 
  /** Makes bullet disappear when it hits other objects */
@@ -24,19 +24,10 @@ class Bullet: public Foreground {
  *  @param y position 
  *  @return nothing
  */
-Bullet::Bullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
+HeatBullet::HeatBullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  srand(time(NULL));
- int py = rand()%9;
- if(py<=2){
- py = -100;
- }
- else if(py<=5){
- py = -70;
- }
- else{
- py = -200;
- }
- state = 2;
+ int py = ny;
+ state = -2;
  setPos(768, py);
  setZValue(2);
  sinking = false;
@@ -48,7 +39,7 @@ Bullet::Bullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
  * @param count of how much time has elapsed since start of game
  * @return nothing
  */
-void Bullet::move(int count) {
+void HeatBullet::move(int count) {
 if(count%2 == 0){
  if(sinking == false){
   moveBy(-2, 0);
@@ -65,7 +56,7 @@ if(count%2 == 0){
  *  @param num that gives case of collision
  *  @return nothing
  */
-void Bullet::collideUp(int num){
+void HeatBullet::collideUp(int num){
  if(num == 0){
   setVisible(false);
  }
@@ -77,7 +68,7 @@ void Bullet::collideUp(int num){
  *  @param num that gives case of collision
  *  @return nothing
  */
-void Bullet::collideDown(int num){
+void HeatBullet::collideDown(int num){
  if(num == 0){
    sinking = true;
  }

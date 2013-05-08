@@ -104,6 +104,8 @@ private:
     QPixmap *eEgg;
     /** Holds bullet image */
     QPixmap *bulletBill;
+    /** Holds heat bullet image */
+    QPixmap *heatBB;
     /** Holds witch image */
     QPixmap *witch;
     /** Holds initial bowser image */

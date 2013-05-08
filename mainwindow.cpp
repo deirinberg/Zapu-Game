@@ -9,6 +9,7 @@
 #include "bolt.h"
 #include "background.h"
 #include "bullet.h"
+#include "heatBullet.h"
 #include "extraEgg.h"
 #include "kamek.h"
 #include "bowser.h"
@@ -147,7 +148,7 @@ if(resetting == false){
   int div = 2000*freq;
   if(spiked == false && genCount == -1 && count!= 0 && count%div==0){
     srand(time(NULL));
-    int rn = rand()%4;
+    int rn = rand()%5;
     moreGaps = false;
     if(rn == 0){
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
@@ -155,15 +156,20 @@ if(resetting == false){
     scene->addItem(fObjects[fObjects.size()-1]);
     }
     else if(rn == 1){
+    HeatBullet *hb  = new HeatBullet(heatBB, bObjects[bObjects.size()-1]->pos().x(), zapu->pos().y()); 
+    fObjects.push_back(hb);
+    scene->addItem(fObjects[fObjects.size()-1]);
+    }
+    else if(rn == 2){
     Kamek *k  = new Kamek(witch, bObjects[bObjects.size()-1]->pos().x(), 0); 
     fObjects.push_back(k);
     spiked = false;
     scene->addItem(fObjects[fObjects.size()-1]);
     }
-    else if(rn == 2){
+    else if(rn == 3){
     genCount = 0;
     }
-    else if(rn == 3){
+    else if(rn == 4){
     if(numLives <= 3 && points>=150 && count%3==0){
     int ground = bObjects[bObjects.size()-1]->pos().y();
     ExtraEgg *e  = new ExtraEgg(eEgg, bObjects[bObjects.size()-1]->pos().x(), ground-18); 
@@ -177,12 +183,15 @@ if(resetting == false){
   }
    for(unsigned int i = 0; i<fObjects.size(); i++){
      fObjects[i]->move(count);
-     if(spiked == false && fObjects[i]->getState() == 1){
-       spiked = true;
-       Spike *s  = new Spike(spikeBall, 35, -236); 
-       fObjects.push_back(s);
-       scene->addItem(fObjects[fObjects.size()-1]);
-     }
+   if(fObjects[i]->getState() == -2 && fObjects[i]->pos().x() > 250){
+      fObjects[i]->setPos(fObjects[i]->pos().x(), zapu->pos().y());
+   }
+   if(spiked == false && fObjects[i]->getState() == 1){
+      spiked = true;
+      Spike *s  = new Spike(spikeBall, 35, -236); 
+      fObjects.push_back(s);
+      scene->addItem(fObjects[fObjects.size()-1]);
+   }
    if(fObjects[i]->isVisible() && zapu->isVisible()){
      if(zapu->collidesWithItem(fObjects[i])){
        if(zapu->getVX() != -2 && (zapu->pos().x() > fObjects[i]->pos().x()) && (zapu->pos().y()-10) < fObjects[i]->pos().y()){
@@ -650,7 +659,8 @@ MainWindow::MainWindow()  {
     ground1 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground1.png");
     ground16 = new QPixmap(qApp->applicationDirPath() + "/Pictures/Ground16.png");
     eEgg = new QPixmap(qApp->applicationDirPath() + "/Pictures/extraEgg.png");
-    bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
+    bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BlueBullet.png");
+    heatBB = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
     witch = new QPixmap(qApp->applicationDirPath() + "/Pictures/Kamek1.png");
     spikeBall = new QPixmap(qApp->applicationDirPath() + "/Pictures/SpikeBall.png");
     bWalk = new QPixmap(qApp->applicationDirPath() + "/Pictures/bWalk1.png");
