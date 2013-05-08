@@ -6,17 +6,17 @@ class HeatBullet: public Foreground {
  public:
  /** Default constructor for bullet */
  HeatBullet (QPixmap *pm, int nx, int ny);
- /** Animates bullet */
+ /** Animates heat bullet */
  void move(int count); 
- /** Makes bullet disappear when it hits other objects */
+ /** Makes heat bullet disappear when it hits other objects */
  void collideUp(int num);
- /** Triggers bullet to sink when jumped on */
+ /** Triggers heat bullet to sink when jumped on */
  void collideDown(int num);
- /** Returns if bullet is sinking or not */
+ /** Returns if heat bullet is sinking or not */
  bool sinking;
 };
 
-/** Default constructor- bullet's y pos is randomly generated and set.
+/** Default constructor- heat bullet's y pos is set to Zapu's y value and it's state is set to -2 so it's y position can change to Zapu's y direction. 
  *  It's z value is set to 2 and sinking is set to false.
  *
  *  @param pointer to QPixmap
@@ -40,7 +40,7 @@ HeatBullet::HeatBullet( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny )
  * @return nothing
  */
 void HeatBullet::move(int count) {
-if(count%2 == 0){
+if(count%3 == 0){
  if(sinking == false){
   moveBy(-2, 0);
  }

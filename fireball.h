@@ -1,11 +1,11 @@
-#ifndef BOLT_H
-#define BOLT_H
+#ifndef FIREBALL_H
+#define FIREBALL_H
 #include "foreground.h"
 
-class Bolt: public Foreground {
+class FireBall: public Foreground {
  public:
  /** Default constructor */
- Bolt(QPixmap *pm, int nx, int ny);
+ FireBall(QPixmap *pm, int nx, int ny);
  /** Animates bolts */
  void move(int count); 
  /** Makes bolt disappear when hits other objects */
@@ -21,18 +21,18 @@ class Bolt: public Foreground {
  *  @param y position 
  *  @return nothing
  */
-Bolt::Bolt( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
- setZValue(1);
+FireBall::FireBall( QPixmap *pm, int nx, int ny ) : Foreground( pm, nx, ny ) {
+ setZValue(2);
 }
 
-/** Moves bolt forward 2 pixels back when a duration has elapsed
+/** Moves fire ball backward 3 pixels back when a duration has elapsed
  *
  * @param count of how much time has elapsed since start of game
  * @return nothing
  */
-void Bolt::move(int count) {
-if(count%2 == 0){
- moveBy(2, 0);
+void FireBall::move(int count) {
+if(count%3 == 0){
+ moveBy(-3, 0);
 }
 }
 
@@ -42,7 +42,7 @@ if(count%2 == 0){
  *  @param num that gives case of collision
  *  @return nothing
  */
-void Bolt::collideUp(int num){
+void FireBall::collideUp(int num){
  if(num!=-1){
   setVisible(false);
  }
@@ -54,11 +54,11 @@ void Bolt::collideUp(int num){
  *  @param num that gives case of collision
  *  @return nothing
  */
-void Bolt::collideDown(int num){
+void FireBall::collideDown(int num){
  if(num!=-1){
   setVisible(false);
  }
 }
 
 
-#endif // BOLT_H
+#endif // FIREBALL_H

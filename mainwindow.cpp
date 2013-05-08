@@ -9,11 +9,13 @@
 #include "bolt.h"
 #include "background.h"
 #include "bullet.h"
+#include "fireball.h"
 #include "heatBullet.h"
 #include "extraEgg.h"
 #include "kamek.h"
-#include "bowser.h"
 #include "spike.h"
+#include "bowser.h"
+#include "fireBowser.h"
 #include "ground.h"
 #include "ui.h"
 
@@ -54,9 +56,10 @@ void MainWindow::animate(){
    resetting = true;
    reset();
   }
-  if(resetting == false){
+  if(resetting == false && zapu->getState()!=-2){
    zapu->move(count); 
     if(zapu->pos().y() > 36){
+     resetting = true;
      reset();
     }
   }
@@ -112,12 +115,13 @@ void MainWindow::animate(){
         setLayout(layout);
         }
         else{
-        resetting = false;
+        cout<<"HERE?\n";
         zapu->setVX(0);
         zapu->setVisible(true);
         zapu->setPixmap(*yoshi);
-        zapu->setPos(10, floor-75);
+        zapu->setPos(10, bObjects[0]->pos().y()-75);
         zapu->setGround(floor);
+        resetting = false;
         }
       }
    }
@@ -140,15 +144,22 @@ void MainWindow::animate(){
 if(resetting == false){
  if(genCount == 5){
    int ground = bObjects[bObjects.size()-1]->pos().y();
-   Bowser *b  = new Bowser(bWalk, bObjects[bObjects.size()-1]->pos().x(), ground); 
-   fObjects.push_back(b);
-   scene->addItem(fObjects[fObjects.size()-1]);
+    if(fireB == false){
+     Bowser *b  = new Bowser(bWalk, bObjects[bObjects.size()-1]->pos().x(), ground); 
+     fObjects.push_back(b);
+     scene->addItem(fObjects[fObjects.size()-1]);
+    }
+    else{
+     FireBowser *fb  = new FireBowser(bWalk, bObjects[bObjects.size()-1]->pos().x(), ground); 
+     fObjects.push_back(fb);
+     scene->addItem(fObjects[fObjects.size()-1]);
+    }
    genCount = -1;
  }
   int div = 2000*freq;
   if(spiked == false && genCount == -1 && count!= 0 && count%div==0){
     srand(time(NULL));
-    int rn = rand()%5;
+    int rn = rand()%6;
     moreGaps = false;
     if(rn == 0){
     Bullet *b  = new Bullet(bulletBill, bObjects[bObjects.size()-1]->pos().x(), 0); 
@@ -168,8 +179,13 @@ if(resetting == false){
     }
     else if(rn == 3){
     genCount = 0;
+    fireB = false;
     }
     else if(rn == 4){
+    genCount = 0;
+    fireB = true; 
+    }
+    else if(rn == 5){
     if(numLives <= 3 && points>=150 && count%3==0){
     int ground = bObjects[bObjects.size()-1]->pos().y();
     ExtraEgg *e  = new ExtraEgg(eEgg, bObjects[bObjects.size()-1]->pos().x(), ground-18); 
@@ -181,12 +197,22 @@ if(resetting == false){
     }
    }
   }
-   for(unsigned int i = 0; i<fObjects.size(); i++){
+  for(unsigned int i = 0; i<fObjects.size(); i++){
      fObjects[i]->move(count);
-   if(fObjects[i]->getState() == -2 && fObjects[i]->pos().x() > 250){
+     int state = fObjects[i]->getState();
+   if(state == -2){
       fObjects[i]->setPos(fObjects[i]->pos().x(), zapu->pos().y());
    }
-   if(spiked == false && fObjects[i]->getState() == 1){
+   if(state == 5 && fObjects[i]->pos().x()>250){
+     fObjects[i]->setPos(fObjects[i]->pos().x(), zapu->pos().y());
+    if(count%800==0 && fObjects[i]->pos().y()<500){
+     cout<<"NEW FIRE BALL!\n";
+     FireBall *f  = new FireBall(fire, fObjects[0]->pos().x(), fObjects[0]->pos().y()+5); 
+     fObjects.push_back(f);
+     scene->addItem(fObjects[fObjects.size()-1]);
+    }
+   }
+   if(spiked == false && state == 1){
       spiked = true;
       Spike *s  = new Spike(spikeBall, 35, -236); 
       fObjects.push_back(s);
@@ -195,32 +221,32 @@ if(resetting == false){
    if(fObjects[i]->isVisible() && zapu->isVisible()){
      if(zapu->collidesWithItem(fObjects[i])){
        if(zapu->getVX() != -2 && (zapu->pos().x() > fObjects[i]->pos().x()) && (zapu->pos().y()-10) < fObjects[i]->pos().y()){
-        if(fObjects[i]->getState()!=3 && fObjects[i]->getState()!=4 && fObjects[i]->getState()!=7){ 
+        if(state!=3 && state!=4 && state!=5 && state!=7){ 
           zapu->collideUp(0);
           fObjects[i]->collideDown(0);
-          if(fObjects[i]->getState()==3){
+          if(state==3){
            fObjects[i-1]->collideDown(0);
           }
          }
-         else if(fObjects[i]->getState()!=4){
+         else if(state!=4){
           zapu->setVX(-2);
           zapu->collideDown(0);
           fObjects[i]->collideUp(0);
           zapu->setState(1);
          }
-         else if(fObjects[i]->getState()==7){
+         else if(state==7){
            scene->removeItem(fObjects.at(i));
 	   fObjects.erase(fObjects.begin()+i);
            addEgg();
          }
         }
-        else if(fObjects[i]->getState()!=4){
-         if(zapu->getState()==-1 && fObjects[i]->getState()==-1){
+        else if(state!=4){
+         if(zapu->getState()==-1 && state==-1){
           bounceBack = true;
           zapu->collideUp(1);
           fObjects[i]->collideDown(1);
          }
-         else if(fObjects[i]->getState()==7){
+         else if(state==7){
           scene->removeItem(fObjects.at(i));
 	  fObjects.erase(fObjects.begin()+i);
           addEgg();
@@ -235,7 +261,7 @@ if(resetting == false){
       }
      if(bounceBack == true){
       for(unsigned int j = 1; j<fObjects.size(); j++){
-       if(fObjects[i]->getState()==1 && fObjects[j]->getState()==-1){
+       if(state==1 && fObjects[j]->getState()==-1){
        if(fObjects[i]->collidesWithItem(fObjects[j])){
           spiked = false;
           bounceBack = false;
@@ -246,7 +272,7 @@ if(resetting == false){
         }
        }}
       }
-     else if(fObjects[i]->getState()==3){
+     else if(state==3 || state == 5){
        for(unsigned int j = 1; j<zObjects.size(); j++){
          if(fObjects[i]->collidesWithItem(zObjects[j])){
            scene->removeItem(zObjects[j]);
@@ -255,7 +281,7 @@ if(resetting == false){
         }
        }
      }
-     else if(fObjects[i]->getState()==4 && zapu->collidesWithItem(fObjects[i])){
+     else if(state==4 && zapu->collidesWithItem(fObjects[i])){
          scene->removeItem(fObjects[i]);
          fObjects.erase(fObjects.begin()+i);
      }
@@ -661,6 +687,7 @@ MainWindow::MainWindow()  {
     eEgg = new QPixmap(qApp->applicationDirPath() + "/Pictures/extraEgg.png");
     bulletBill = new QPixmap(qApp->applicationDirPath() + "/Pictures/BlueBullet.png");
     heatBB = new QPixmap(qApp->applicationDirPath() + "/Pictures/BulletBill.png");
+    fire = new QPixmap(qApp->applicationDirPath() + "/Pictures/FireBall.png");
     witch = new QPixmap(qApp->applicationDirPath() + "/Pictures/Kamek1.png");
     spikeBall = new QPixmap(qApp->applicationDirPath() + "/Pictures/SpikeBall.png");
     bWalk = new QPixmap(qApp->applicationDirPath() + "/Pictures/bWalk1.png");

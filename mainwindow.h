@@ -67,6 +67,8 @@ public:
     bool bounceBack;
     /** Returns if there are more jumps or not */
     bool moreGaps;
+    /** Determines if Bowser shoots fire balls or not */
+    bool fireB;
     /** Resets main character if a life is lost */
     void reset();
     /** Updates the score of the game */
@@ -106,6 +108,8 @@ private:
     QPixmap *bulletBill;
     /** Holds heat bullet image */
     QPixmap *heatBB;
+    /** Holds fire ball image */
+    QPixmap *fire;
     /** Holds witch image */
     QPixmap *witch;
     /** Holds initial bowser image */
